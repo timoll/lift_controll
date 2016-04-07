@@ -37,6 +37,8 @@ char direction_lift_2;
 
 char state=0;
 
+
+
 /*----- Definition ----------------------------------------------------------*/
 #define Inform				0
 #define Order_distribution	1
@@ -47,6 +49,10 @@ char state=0;
 
 char maxmin_floor (char direction,char position);
 char Direction (char p[][2],char last_position);
+void Array_arrange_2 (char p[][2]);
+void Array_arrange_3 (char p[][3]);
+
+
 
 void controller(void)
 {
@@ -102,12 +108,50 @@ char Direction (char p[][2],char last_position)
 	}
 	// höchste oder tiefste position
 }
-
-char Array_arrange (void) //Array sortieren
+void Array_arrange_2 (char p[][2]) //Array sortieren
 {
+	int i,j;
+	j=0;
+	for(i=0;i<10;i++)
+	{
+		if(p[i][0]==0)
+		{
+			j++;
+		}
 
+		p[i-j][0]=p[i][0];
+		p[i-j][1]=p[i][1];
+
+	}
+	for(i=0;i<j;i++)
+	{
+		p[10-i][0]=0;
+		p[10-i][1]=0;
+	}
 }
+void Array_arrange_3 (char p[][3]) //Array sortieren
+{
+	int i,j;
+	j=0;
+	for(i=0;i<10;i++)
+	{
+		if(p[i][0]==0)
+		{
+			j++;
+		}
 
+		p[i-j][0]=p[i][0];
+		p[i-j][1]=p[i][1];
+		p[i-j][2]=p[i][2];
+
+	}
+	for(i=0;i<j;i++)
+	{
+		p[10-i][0]=0;
+		p[10-i][1]=0;
+		p[10-i][2]=0;
+	}
+}
 char maxmin_floor (char direction,char position)
 {
 	if(direction==0)
