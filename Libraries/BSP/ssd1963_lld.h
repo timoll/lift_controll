@@ -77,18 +77,59 @@ extern "C" {
 
 /*----- Header-Files -------------------------------------------------------*/
 #include <stdint.h>					/* Standard integer formats				*/
+#include <carme.h>
 
 /*----- Macros -------------------------------------------------------------*/
+/**
+ * @brief	SSD1963 command and data register base address.
+ */
+#define GL_LCD_BASE		(FSMC_LCD_SSD1963_BASE)
+
+/**
+ * @brief	SSD1963 command and data register.
+ */
+#define GL_LCD			((SSD1963_T *) (GL_LCD_BASE))
 
 /*----- Data types ---------------------------------------------------------*/
+/**
+ * @struct	_SSD1963_T
+ * @typedef	SSD1963_T
+ * @brief	SSD1963 command and data register structure.
+ */
+typedef struct _SSD1963_T {
+	__IO uint16_t CMD;
+	__IO uint16_t DATA;
+} SSD1963_T;
 
 /*----- Function prototypes ------------------------------------------------*/
 void SSD1963_LLD_Init(void);
-void SSD1963_WriteCommand(uint16_t cmd);
-void SSD1963_WriteData(uint16_t data);
-uint16_t SSD1963_ReadData(void);
 
 /*----- Data ---------------------------------------------------------------*/
+
+/*----- Implementation -----------------------------------------------------*/
+/**
+ * @brief		Write command to display controller.
+ * @param[in]	cmd		command to write.
+ */
+static inline void SSD1963_WriteCommand(uint16_t cmd) {
+	GL_LCD->CMD = cmd;
+}
+
+/**
+ * @brief		Write data to display controller.
+ * @param[in]	data	ram data to write.
+ */
+static inline void SSD1963_WriteData(uint16_t data) {
+	GL_LCD->DATA = data;
+}
+
+/**
+ * @brief		Read data from the display controller.
+ * @return		16 Bit value
+ */
+static inline uint16_t SSD1963_ReadData(void) {
+	return GL_LCD->DATA;
+}
 
 #ifdef __cplusplus
 }

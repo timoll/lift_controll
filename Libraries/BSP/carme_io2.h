@@ -100,9 +100,7 @@ extern "C" {
 
 /*----- Data types ---------------------------------------------------------*/
 /**
- * \enum	_CARME_IO2_ADC_CHANNEL
- * \typedef	CARME_IO2_ADC_CHANNEL
- * \brief	ADC port names.
+ * @brief	ADC port names.
  */
 typedef enum _CARME_IO2_ADC_CHANNEL {
 	CARME_IO2_ADC_PORT0 = 0,			/**< Port 0, Poti					*/
@@ -111,9 +109,7 @@ typedef enum _CARME_IO2_ADC_CHANNEL {
 } CARME_IO2_ADC_CHANNEL;
 
 /**
- * \enum	_CARME_IO2_GPIO_OUT_MODE
- * \typedef	CARME_IO2_GPIO_OUT_MODE
- * \brief	GPIO Out mode definitions.
+ * @brief	GPIO Out mode definitions.
  */
 typedef enum _CARME_IO2_GPIO_OUT_MODE {
 	CARME_IO2_GPIO_OUT_MODE_GPIO = GPIO_Mode_OUT,	/**< GPIO Out mode as
@@ -123,9 +119,7 @@ typedef enum _CARME_IO2_GPIO_OUT_MODE {
 } CARME_IO2_GPIO_OUT_MODE;
 
 /**
- * \enum	_CARME_IO2_DAC_CHANNEL
- * \typedef	CARME_IO2_DAC_CHANNEL
- * \brief	DAC port names.
+ * @brief	DAC port names.
  */
 typedef enum _CARME_IO2_DAC_CHANNEL {
 	CARME_IO2_DAC_OUT0 = CARME_IO2_LTC2622_ADDR_A,	/**< DAC Out 0			*/
@@ -134,9 +128,7 @@ typedef enum _CARME_IO2_DAC_CHANNEL {
 } CARME_IO2_DAC_CHANNEL;
 
 /**
- * \enum	_CARME_IO2_SPI_CHANNEL
- * \typedef	CARME_IO2_SPI_CHANNEL
- * \brief	ADC port names.
+ * @brief	ADC port names.
  */
 typedef enum _CARME_IO2_SPI_CHANNEL {
 	CARME_IO2_nPSC0 = 0,				/**< DAC, SPI0						*/
@@ -144,9 +136,7 @@ typedef enum _CARME_IO2_SPI_CHANNEL {
 } CARME_IO2_SPI_CHANNEL;
 
 /**
- * \enum	_CARME_IO2_PWM_CHANNEL
- * \typedef	CARME_IO2_PWM_CHANNEL
- * \brief	PWM port names.
+ * @brief	PWM port names.
  */
 typedef enum _CARME_IO2_PWM_CHANNEL {
 	CARME_IO2_PWM0,						/**< PWM0							*/
@@ -156,9 +146,7 @@ typedef enum _CARME_IO2_PWM_CHANNEL {
 } CARME_IO2_PWM_CHANNEL;
 
 /**
- * \enum	_CARME_IO2_PWM_PHASE
- * \typedef	CARME_IO2_PWM_PHASE
- * \brief	DC motor direction.
+ * @brief	DC motor direction.
  */
 typedef enum _CARME_IO2_PWM_PHASE {
 	CARME_IO2_PWM_NORMAL_DIRECTION,		/**< Forward						*/
@@ -171,15 +159,15 @@ extern void CARME_IO2_GPIO_Out_Settings(uint8_t pin,
                                         CARME_IO2_GPIO_OUT_MODE mode);
 extern void CARME_IO2_ADC_Get(CARME_IO2_ADC_CHANNEL channel, uint16_t *pValue);
 extern void CARME_IO2_DAC_Set(CARME_IO2_DAC_CHANNEL channel, uint16_t Value);
-extern inline void CARME_IO2_SPI_Select(CARME_IO2_SPI_CHANNEL select);
-extern inline void CARME_IO2_SPI_CS_Out(uint8_t cs);
+extern void CARME_IO2_SPI_Select(CARME_IO2_SPI_CHANNEL select);
+extern void CARME_IO2_SPI_CS_Out(uint8_t cs);
 extern void CARME_IO2_SPI_Send(uint16_t data);
 extern void CARME_IO2_SPI_Receive(uint16_t *pValue);
 extern void CARME_IO2_PWM_Settings(
         TIM_TimeBaseInitTypeDef *pTIM_TimeBaseStruct);
 extern ERROR_CODES CARME_IO2_PWM_Set(CARME_IO2_PWM_CHANNEL channel,
                                      uint16_t value);
-extern inline void CARME_IO2_PWM_Phase(CARME_IO2_PWM_PHASE dir);
+extern void CARME_IO2_PWM_Phase(CARME_IO2_PWM_PHASE dir);
 extern void CARME_IO2_GPIO_IN_Get(uint8_t *pStatus);
 extern void CARME_IO2_GPIO_OUT_Set(uint8_t Status);
 extern void CARME_IO2_OPTO_IN_Get(uint8_t *pStatus);

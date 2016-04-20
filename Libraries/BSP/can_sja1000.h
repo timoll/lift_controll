@@ -87,12 +87,12 @@ extern "C" {
 #define	SJA1000_SR			0x02	/**< status register					*/
 #define	SJA1000_IR			0x03	/**< interrupt register					*/
 #define SJA1000_IER			0x04	/**< interrupt enable register			*/
-// reserved					0x05
+/* reserved					0x05	*/
 #define	SJA1000_BTR0		0x06	/**< bus timing 0						*/
 #define	SJA1000_BTR1		0x07	/**< bus timing 1						*/
 #define	SJA1000_OCR			0x08	/**< output control						*/
-// test					    0x09
-// reserved					0x0a
+/* test					    0x09	*/
+/* reserved					0x0a	*/
 #define SJA1000_ALC			0x0b	/**< Arbitration Lost Capture			*/
 #define SJA1000_ECC			0x0c	/**< Error Code Capture					*/
 #define SJA1000_EWL			0x0d	/**< Error Warning Limit				*/
@@ -109,25 +109,25 @@ extern "C" {
 /*****************************************************************************
  * 								FLAGS  (PeliCAN Mode)
  ****************************************************************************/
-// mode register
+/* mode register */
 #define SJA1000_MOD_SM			(1<<4)	/**< Sleep Mode						*/
 #define SJA1000_MOD_AFM			(1<<3)	/**< Acceptance Filter Mode			*/
 #define SJA1000_MOD_STM			(1<<2)	/**< Self Test Mode					*/
 #define SJA1000_MOD_LOM			(1<<1)	/**< Listen Only Mode				*/
 #define SJA1000_MOD_RM			(1<<0)	/**< Reset Mode						*/
-// command register
+/* command register */
 #define SJA1000_CMR_SRR			(1<<4)	/**< Self Reception Request			*/
 #define SJA1000_CMR_CDO			(1<<3)	/**< Clear Data Overrun				*/
 #define SJA1000_CMR_RRB			(1<<2)	/**< Release Receive Buffer			*/
 #define SJA1000_CMR_AT			(1<<1)	/**< Abort Transmission				*/
 #define SJA1000_CMR_TR			(1<<0)	/**< Transmission Request			*/
-// interrupt register
+/* interrupt register */
 #define SJA1000_IR_BEI			(1<<7)	/**< Bus Error Interrupt			*/
 #define SJA1000_IR_ALI			(1<<6)	/**< Arbitration Lost Interrupt		*/
 #define SJA1000_IR_EPI			(1<<5)	/**< Error Passive Interrupt		*/
-// additional declarations are below
+/* additional declarations are below */
 
-// interrupt enable register
+/* interrupt enable register */
 #define SJA1000_IER_BEIE		(1<<7)	/**< Bus Error Interrupt Enable		*/
 #define SJA1000_IER_ALIE		(1<<6)	/**< Arbitration Lost Interrupt Enable */
 #define SJA1000_IER_EPIE		(1<<5)	/**< Error Passive Interrupt Enable	*/
@@ -136,10 +136,10 @@ extern "C" {
 #define SJA1000_IER_EIE			(1<<2)	/**< Error Warning Interrupt Enable	*/
 #define SJA1000_IER_TIE			(1<<1)	/**< Transmit Interrupt Enable		*/
 #define SJA1000_IER_RIE			(1<<0)	/**< Receive Interrupt Enable		*/
-// Frame information
+/* Frame information */
 #define SJA1000_FRAMEINFO_FF	(1<<7)	/**< Frame Format					*/
 #define SJA1000_FRAMEINFO_RTR	(1<<6)	/**< Remote transmission Request	*/
-// status register
+/* status register */
 #define SJA1000_SR_BS			(1<<7)	/**< bus status						*/
 #define SJA1000_SR_ES			(1<<6)	/**< error status					*/
 #define SJA1000_SR_TS			(1<<5)	/**< transmit status				*/
@@ -148,13 +148,13 @@ extern "C" {
 #define SJA1000_SR_TBS			(1<<2)	/**< transmit buffer status			*/
 #define SJA1000_SR_DOS			(1<<1)	/**< data overrun status			*/
 #define SJA1000_SR_RBS			(1<<0)	/**< receive buffer status			*/
-// interrupt register
+/* interrupt register */
 #define SJA1000_IR_WUI			(1<<4)	/**< wake-up interrupt				*/
 #define SJA1000_IR_DOI			(1<<3)	/**< data overrun interrupt			*/
 #define SJA1000_IR_EI			(1<<2)	/**< error interrupt				*/
 #define SJA1000_IR_TI			(1<<1)	/**< transmit interrupt				*/
 #define SJA1000_IR_RI			(1<<0)	/**< receive interrupt				*/
-// clock divider register (CDR)
+/* clock divider register (CDR) */
 #define SJA1000_CDR_CANMODE		(1<<7)	/**< can mode (BasicCAN or PeliCAN)	*/
 #define SJA1000_CDR_CBP			(1<<6)	/**< input bypass					*/
 #define SJA1000_CDR_RXINTEN		(1<<5)	/**< TX1 as receive interrupt output*/

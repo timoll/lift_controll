@@ -75,6 +75,8 @@ extern "C" {
 
 /*----- Header-Files -------------------------------------------------------*/
 #include <stdint.h>					/* Standard integer formats				*/
+#include "ssd1963_lld.h"			/* SSD1963 Graphic-Controller driver	*/
+#include "ssd1963_cmd.h"			/* SSD1963 Graphic-Controller commands	*/
 
 /*----- Macros -------------------------------------------------------------*/
 
@@ -89,10 +91,6 @@ void SSD1963_FillArea(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2,
                       uint16_t color);
 void SSD1963_WriteArea(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2,
                        uint16_t *pData);
-void SSD1963_EnterSleepMode(void);
-void SSD1963_ExitSleepMode(void);
-void SSD1963_DisplayOff(void);
-void SSD1963_DisplayOn(void);
 void SSD1963_SetTearingCfg(uint8_t state, uint8_t mode);
 void SSD1963_GetDeviceDescriptorBlock(uint16_t *ddb);
 
@@ -103,6 +101,36 @@ void SSD1963_WriteData(uint16_t data);
 uint16_t SSD1963_ReadData(void);
 
 /*----- Data ---------------------------------------------------------------*/
+
+/*----- Implementation -----------------------------------------------------*/
+/**
+ * @brief		SSD1963 enters sleep mode.\n
+ * Host must wait 5mS after sending before sending next command.
+ */
+static inline void SSD1963_EnterSleepMode(void) {
+	SSD1963_WriteCommand(CMD_ENT_SLEEP);
+}
+
+/**
+ * @brief		SSD1963 exit sleep mode.
+ */
+static inline void SSD1963_ExitSleepMode(void) {
+	SSD1963_WriteCommand(CMD_EXIT_SLEEP);
+}
+
+/**
+ * @brief		SSD1963 changes the display state to OFF state.
+ */
+static inline void SSD1963_DisplayOff(void) {
+	SSD1963_WriteCommand(CMD_BLANK_DISPLAY);
+}
+
+/**
+ * @brief		SSD1963 changes the display state to ON state.
+ */
+static inline void SSD1963_DisplayOn(void) {
+	SSD1963_WriteCommand(CMD_ON_DISPLAY);
+}
 
 #ifdef __cplusplus
 }

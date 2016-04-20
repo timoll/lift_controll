@@ -80,9 +80,7 @@ extern "C" {
 
 /*----- Data types ---------------------------------------------------------*/
 /**
- * \enum	_CARME_IO1_PIO_PORT
- * \typedef	CARME_IO1_PIO_PORT
- * \brief	This enum contains all available Ports of the PIO device
+ * @brief	This enum contains all available Ports of the PIO device
  */
 typedef enum _CARME_IO1_PIO_PORT {
 	CARME_IO1_PORT_A,				/**< Port A [PA0 ... PA7] */
@@ -93,9 +91,7 @@ typedef enum _CARME_IO1_PIO_PORT {
 } CARME_IO1_PIO_PORT;
 
 /**
- * \enum	_CARME_IO1_PIO_CONTROL
- * \typedef	CARME_IO1_PIO_CONTROL
- * \brief	This contains all possible commands for the PIO device
+ * @brief	This contains all possible commands for the PIO device
  */
 typedef enum _CARME_IO1_PIO_CONTROL {
 	CARME_IO1_PORT_A_IN = 0x01,		/**< input Port A					*/
@@ -111,8 +107,8 @@ typedef enum _CARME_IO1_PIO_CONTROL {
 /*----- Function prototypes ------------------------------------------------*/
 extern void CARME_IO1_Init(void);
 extern void CARME_IO1_LED_Set(uint8_t write, uint8_t mask);
-extern inline void CARME_IO1_LED_Get(uint8_t *pStatus);
-extern inline void CARME_IO1_SWITCH_Get(uint8_t *pStatus);
+extern void CARME_IO1_LED_Get(uint8_t *pStatus);
+extern void CARME_IO1_SWITCH_Get(uint8_t *pStatus);
 extern void CARME_IO1_BUTTON_Get(uint8_t *pStatus);
 extern void CARME_IO1_PIO_Write(CARME_IO1_PIO_PORT port, uint8_t data);
 extern void CARME_IO1_PIO_Read(CARME_IO1_PIO_PORT port, uint8_t *data);

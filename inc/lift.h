@@ -27,6 +27,4 @@ extern void moveUp(void);
 extern void moveDown(void);
 
 
-
-
 #endif /* LIFT_H_ */

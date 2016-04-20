@@ -43,5 +43,6 @@
 #include "messages.h"
 #include "main.h"
 #include "com.h"
+#include "lift.h"
 
 #endif /* __INCLUDES_H__ */

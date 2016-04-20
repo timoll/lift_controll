@@ -93,14 +93,17 @@ extern "C" {
 
 /*----- Data types ---------------------------------------------------------*/
 /**
- * \typedef	LCDCOLOR
- * \brief	Data type for a color definition.
+ * @brief	Data type for a color definition.
  */
 typedef uint16_t LCDCOLOR;
 
 /*----- Function prototypes ------------------------------------------------*/
 
 /*----- Data ---------------------------------------------------------------*/
+
+/*----- Implementation -----------------------------------------------------*/
+
+/*----- EOF ----------------------------------------------------------------*/
 
 #ifdef __cplusplus
 }

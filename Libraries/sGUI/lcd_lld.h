@@ -77,29 +77,29 @@ extern "C" {
 #include <stdint.h>					/* Standard integer formats				*/
 #include "ssd1963.h"				/* SSD1963 Graphic-Controller			*/
 
+/*----- Macros -------------------------------------------------------------*/
+
+/*----- Data types ---------------------------------------------------------*/
+
+/*----- Function prototypes ------------------------------------------------*/
+
+/*----- Data ---------------------------------------------------------------*/
+
+/*----- Implementation -----------------------------------------------------*/
 /**
- *****************************************************************************
- * \brief		Initialize the interface, controller and the display.
- *
- * \param		None
- * \return		None
- *****************************************************************************
+ * @brief		Initialize the interface, controller and the display.
  */
 static inline void LCD_Init(void) {
 	SSD1963_Init();
 }
 
 /**
- *****************************************************************************
- * \brief		Fill a specified area on the display with the same color.
- *
- * \param[in]	x1		start column from the left.
- * \param[in]	y1		start row from the top.
- * \param[in]	x2		end column from the left.
- * \param[in]	y2		end row from the top.
- * \param[in]	color	Color in format of 16-Bit in the RGB 5-6-5 format.
- * \return		None
- *****************************************************************************
+ * @brief		Fill a specified area on the display with the same color.
+ * @param[in]	x1		start column from the left.
+ * @param[in]	y1		start row from the top.
+ * @param[in]	x2		end column from the left.
+ * @param[in]	y2		end row from the top.
+ * @param[in]	color	Color in format of 16-Bit in the RGB 5-6-5 format.
  */
 static inline void LCD_FillArea(uint16_t x1, uint16_t y1, uint16_t x2,
                                 uint16_t y2, uint16_t color) {
@@ -107,17 +107,13 @@ static inline void LCD_FillArea(uint16_t x1, uint16_t y1, uint16_t x2,
 }
 
 /**
- *****************************************************************************
- * \brief		Write an array of data to a specified area on the display.
- *
- * \param[in]	x1		start column from the left.
- * \param[in]	y1		start row from the top.
- * \param[in]	x2		end column from the left.
- * \param[in]	y2		end row from the top.
- * \param[in]	data	Pointer to the array of pixels in format of 16-Bit
+ * @brief		Write an array of data to a specified area on the display.
+ * @param[in]	x1		start column from the left.
+ * @param[in]	y1		start row from the top.
+ * @param[in]	x2		end column from the left.
+ * @param[in]	y2		end row from the top.
+ * @param[in]	pData	Pointer to the array of pixels in format of 16-Bit
  *						color value in the RGB 5-6-5 format.
- * \return		None
- *****************************************************************************
  */
 static inline void LCD_WriteArea(uint16_t x1, uint16_t y1, uint16_t x2,
                                  uint16_t y2, uint16_t *pData) {
@@ -125,18 +121,16 @@ static inline void LCD_WriteArea(uint16_t x1, uint16_t y1, uint16_t x2,
 }
 
 /**
- *****************************************************************************
- * \brief		Write one pixel to the display.
- *
- * \param[in]	x		start column from the left.
- * \param[in]	y		start row from the top.
- * \param[in]	pixel	Color in format of 16-Bit in the RGB 5-6-5 format.
- * \return		None
- *****************************************************************************
+ * @brief		Write one pixel to the display.
+ * @param[in]	x		start column from the left.
+ * @param[in]	y		start row from the top.
+ * @param[in]	pixel	Color in format of 16-Bit in the RGB 5-6-5 format.
  */
 static inline void LCD_WritePixel(uint16_t x, uint16_t y, uint16_t pixel) {
 	SSD1963_WritePixel(x, y, pixel);
 }
+
+/*----- EOF ----------------------------------------------------------------*/
 
 #ifdef __cplusplus
 }

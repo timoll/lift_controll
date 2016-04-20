@@ -84,9 +84,7 @@ extern "C" {
 
 /*----- Data types ---------------------------------------------------------*/
 /**
- * \struct	_BMP_Header
- * \typedef	BMP_Header
- * \brief	Bitmap header
+ * @brief	Bitmap header
  */
 typedef struct _BMP_Header {
 	uint16_t Magic;				/**< Magic identifier: "BM"					*/
@@ -113,9 +111,7 @@ typedef struct _BMP_Header {
 } BMP_Header;
 
 /**
- * \struct	_BMP
- * \typedef	BMP
- * \brief	Bitmap image
+ * @brief	Bitmap image
  */
 typedef struct _BMP {
 	BMP_Header Header;			/**< Bitmap header							*/
@@ -123,9 +119,7 @@ typedef struct _BMP {
 } BMP;
 
 /**
- * \enum	_BMP_STATUS
- * \typedef	BMP_STATUS
- * \brief	Error codes
+ * @brief	Error codes
  */
 typedef enum _BMP_STATUS
 {
@@ -144,18 +138,15 @@ typedef enum _BMP_STATUS
 } BMP_STATUS;
 
 /*----- Function prototypes ------------------------------------------------*/
-/*  Main functionality */
-inline void LCD_Clear(LCDCOLOR Color);
-
 /* Text functionality */
-inline void LCD_SetTextColor(LCDCOLOR Color);
-inline void LCD_SetBackColor(LCDCOLOR Color);
-inline void LCD_SetFont(FONT_T *pFont);
-inline FONT_T* LCD_GetFont(void);
-inline uint8_t LCD_GetLineCount(void);
-inline void LCD_ClearLine(uint8_t Line);
-inline void LCD_DisplayCharXY(uint16_t x, uint16_t y, char Ascii);
-inline void LCD_DisplayCharLine(uint8_t Line, uint8_t Column, char Ascii);
+void LCD_SetTextColor(LCDCOLOR Color);
+void LCD_SetBackColor(LCDCOLOR Color);
+void LCD_SetFont(FONT_T *pFont);
+FONT_T* LCD_GetFont(void);
+uint8_t LCD_GetLineCount(void);
+void LCD_ClearLine(uint8_t Line);
+void LCD_DisplayCharXY(uint16_t x, uint16_t y, char Ascii);
+void LCD_DisplayCharLine(uint8_t Line, uint8_t Column, char Ascii);
 void LCD_DisplayStringXY(uint16_t x, uint16_t y, const char *ptr);
 void LCD_DisplayStringLine(uint8_t Line, const char *ptr);
 void LCD_DisplayStringCenterLine(uint8_t Line, const char *ptr);
@@ -169,10 +160,12 @@ void LCD_DrawLine(uint16_t Xstart, uint16_t Ystart, uint16_t Xstop,
                   uint16_t Ystop, LCDCOLOR Color);
 void LCD_DrawRect(uint16_t Xpos, uint16_t Ypos, uint16_t width,
                   uint16_t height, LCDCOLOR Color);
-inline void LCD_DrawRectF(uint16_t Xpos, uint16_t Ypos, uint16_t width,
-                          uint16_t height, LCDCOLOR Color);
-void LCD_DrawCircle(uint8_t Xpos, uint16_t Ypos, uint16_t Radius,
+void LCD_DrawRectF(uint16_t Xpos, uint16_t Ypos, uint16_t width,
+                   uint16_t height, LCDCOLOR Color);
+void LCD_DrawCircle(uint16_t Xpos, uint16_t Ypos, uint16_t Radius,
                     LCDCOLOR Color);
+void LCD_DrawCircleF(uint8_t Xpos, uint16_t Ypos, uint16_t Radius,
+        		LCDCOLOR Color);
 
 /* Bitmap functionality */
 BMP_STATUS LCD_BMP_DrawBitmap(const char *filename, uint16_t Xpos,
@@ -186,6 +179,17 @@ BMP_STATUS LCD_BMP_GetPixelRGB(BMP *bmp, uint32_t x, uint32_t y, uint8_t *r,
 const char* LCD_BMP_GetErrorDescription(uint8_t errorcode);
 
 /*----- Data ---------------------------------------------------------------*/
+
+/*----- Implementation -----------------------------------------------------*/
+/**
+ * @brief		Clears the whole LCD.
+ * @param[in]	Color	The background color.
+ */
+static inline void LCD_Clear(LCDCOLOR Color) {
+	LCD_FillArea(SCRN_LEFT, SCRN_TOP, SCRN_RIGHT, SCRN_BOTTOM, Color);
+}
+
+/*----- EOF ----------------------------------------------------------------*/
 
 #ifdef __cplusplus
 }

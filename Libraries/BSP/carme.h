@@ -143,7 +143,7 @@ extern "C" {
 #define CARME_ERROR_EEPROM_BASE		0xE0			/**< EEPROM errors		*/
 
 /**
- * \brief	Get the pin source from the pin number.
+ * @brief	Get GPIO_PinSourcex from GPIO_Pin_x.
  */
 #define CARME_GPIO_PIN_TO_SOURCE(GPIO_PIN)	(								\
 		((GPIO_PIN) & GPIO_Pin_0) ? GPIO_PinSource0 :	/* bit 0 is set? */	\
@@ -165,9 +165,9 @@ extern "C" {
 		-1)												/* no bits are set */
 
 /**
- * \brief	Get the port source from the port number.
+ * @brief	Get EXTI_PortSourceGPIOx from GPIOx.
  */
-#define CARME_GPIO_TO_EXTIPORT(GPIO_PORT)	(								\
+#define CARME_GPIO_TO_EXTIPORTSOURCE(GPIO_PORT)	(							\
 		(GPIO_PORT == GPIOA) ? EXTI_PortSourceGPIOA :	/* Port A? */		\
 		(GPIO_PORT == GPIOB) ? EXTI_PortSourceGPIOB :	/* Port B? */		\
 		(GPIO_PORT == GPIOC) ? EXTI_PortSourceGPIOC :	/* Port C? */		\
@@ -180,9 +180,9 @@ extern "C" {
 		-1)												/* no port is set */
 
 /**
- * \brief	Get the pin EXTI source from the pin number.
+ * @brief	Get EXTI_PinSourcex from GPIO_Pin_x.
  */
-#define CARME_GPIO_TO_EXTIPIN(GPIO_PIN)	(									\
+#define CARME_GPIO_TO_EXTIPINSOURCE(GPIO_PIN)	(							\
 		((GPIO_PIN) & GPIO_Pin_0) ? EXTI_PinSource0 :	/* bit 0 is set? */	\
 		((GPIO_PIN) & GPIO_Pin_1) ? EXTI_PinSource1 :	/* bit 1 is set? */	\
 		((GPIO_PIN) & GPIO_Pin_2) ? EXTI_PinSource2 :	/* bit 2 is set? */	\
@@ -201,25 +201,45 @@ extern "C" {
 		((GPIO_PIN) & GPIO_Pin_15) ? EXTI_PinSource15 :	/* bit 15 is set? */\
 		-1)												/* no bits are set */
 
+/**
+ * @brief	Get EXTI_Linex from GPIO_Pin_x.
+ */
+#define CARME_GPIO_TO_EXTILINE(GPIO_PIN)	(								\
+		((GPIO_PIN) & GPIO_Pin_0) ? EXTI_Line0 :		/* bit 0 is set? */	\
+		((GPIO_PIN) & GPIO_Pin_1) ? EXTI_Line1 :		/* bit 1 is set? */	\
+		((GPIO_PIN) & GPIO_Pin_2) ? EXTI_Line2 :		/* bit 2 is set? */	\
+		((GPIO_PIN) & GPIO_Pin_3) ? EXTI_Line3 :		/* bit 3 is set? */	\
+		((GPIO_PIN) & GPIO_Pin_4) ? EXTI_Line4 :		/* bit 4 is set? */	\
+		((GPIO_PIN) & GPIO_Pin_5) ? EXTI_Line5 :		/* bit 5 is set? */	\
+		((GPIO_PIN) & GPIO_Pin_6) ? EXTI_Line6 :		/* bit 6 is set? */	\
+		((GPIO_PIN) & GPIO_Pin_7) ? EXTI_Line7 :		/* bit 7 is set? */	\
+		((GPIO_PIN) & GPIO_Pin_8) ? EXTI_Line8 :		/* bit 8 is set? */	\
+		((GPIO_PIN) & GPIO_Pin_9) ? EXTI_Line9 :		/* bit 9 is set? */	\
+		((GPIO_PIN) & GPIO_Pin_10) ? EXTI_Line10 :		/* bit 10 is set? */\
+		((GPIO_PIN) & GPIO_Pin_11) ? EXTI_Line11 :		/* bit 11 is set? */\
+		((GPIO_PIN) & GPIO_Pin_12) ? EXTI_Line12 :		/* bit 12 is set? */\
+		((GPIO_PIN) & GPIO_Pin_13) ? EXTI_Line13 :		/* bit 13 is set? */\
+		((GPIO_PIN) & GPIO_Pin_14) ? EXTI_Line14 :		/* bit 14 is set? */\
+		((GPIO_PIN) & GPIO_Pin_15) ? EXTI_Line15 :		/* bit 15 is set? */\
+		-1)												/* no bits are set */
+
 #ifndef max
 /**
- * \brief	Get the maximum of two numbers.
+ * @brief	Get the maximum of two numbers.
  */
 #define max(a, b)	( ((a) > (b)) ? (a) : (b) )
 #endif
 
 #ifndef min
 /**
- * \brief	Get the minimum of two numbers.
+ * @brief	Get the minimum of two numbers.
  */
 #define min(a, b)	( ((a) < (b)) ? (a) : (b) )
 #endif
 
 /*----- Data types ---------------------------------------------------------*/
 /**
- * \struct	_CARME_Port_Pin_t
- * \typedef	CARME_Port_Pin_t
- * \brief	CARME port and pin association structure.
+ * @brief	CARME port and pin association structure.
  */
 typedef struct _CARME_Port_Pin_t {
 	GPIO_TypeDef* GPIOx;
@@ -229,8 +249,7 @@ typedef struct _CARME_Port_Pin_t {
 } CARME_Port_Pin_t;
 
 /**
- * \typedef	ERROR_CODES
- * \brief	Error variable
+ * @brief	Error variable
  */
 typedef uint8_t ERROR_CODES;
 
@@ -240,10 +259,10 @@ extern void CARME_GPIO_Init(CARME_Port_Pin_t *pPortPinAssociation,
                             GPIO_InitTypeDef *pGPIO_InitStruct, uint8_t size);
 extern void CARME_AGPIO_Set(uint32_t write, uint32_t mask);
 extern void CARME_AGPIO_Get(uint32_t *pStatus);
-extern inline void CARME_LED_Green_Set(void);
-extern inline void CARME_LED_Green_Reset(void);
-extern inline void CARME_LED_Red_Set(void);
-extern inline void CARME_LED_Red_Reset(void);
+extern void CARME_LED_Green_Set(void);
+extern void CARME_LED_Green_Reset(void);
+extern void CARME_LED_Red_Set(void);
+extern void CARME_LED_Red_Reset(void);
 
 /*----- Data ---------------------------------------------------------------*/
 

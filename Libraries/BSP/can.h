@@ -87,23 +87,23 @@ extern "C" {
 #define CARME_CAN_BAUD_1M			1000000		/**< Baudrade 1M			*/
 
 /* error codes */
-#define	CARME_ERROR_CAN							CARME_ERROR_CAN_BASE + 0	/**< \brief Common CAN error		*/
-#define CARME_ERROR_CAN_INVALID_BAUDRATE		CARME_ERROR_CAN_BASE + 1	/**< \brief Invalid baudrate		*/
-#define CARME_ERROR_CAN_RXFIFO_EMPTY			CARME_ERROR_CAN_BASE + 2	/**< \brief RxFIFO empty			*/
-#define CARME_ERROR_CAN_INVALID_MODE			CARME_ERROR_CAN_BASE + 3	/**< \brief Invalid mode			*/
-#define CARME_ERROR_CAN_INVALID_OPMODE			CARME_ERROR_CAN_BASE + 4	/**< \brief Invalid opmode			*/
-#define CARME_ERROR_CAN_INVALID_ACCEPTANCE_MODE	CARME_ERROR_CAN_BASE + 5	/**< \brief Invalid acceptance mode	*/
-#define CARME_ERROR_CAN_ERROR_STATUS			CARME_ERROR_CAN_BASE + 6	/**< \brief Status error			*/
+#define	CARME_ERROR_CAN							CARME_ERROR_CAN_BASE + 0	/**< Common CAN error		*/
+#define CARME_ERROR_CAN_INVALID_BAUDRATE		CARME_ERROR_CAN_BASE + 1	/**< Invalid baudrate		*/
+#define CARME_ERROR_CAN_RXFIFO_EMPTY			CARME_ERROR_CAN_BASE + 2	/**< RxFIFO empty			*/
+#define CARME_ERROR_CAN_INVALID_MODE			CARME_ERROR_CAN_BASE + 3	/**< Invalid mode			*/
+#define CARME_ERROR_CAN_INVALID_OPMODE			CARME_ERROR_CAN_BASE + 4	/**< Invalid opmode			*/
+#define CARME_ERROR_CAN_INVALID_ACCEPTANCE_MODE	CARME_ERROR_CAN_BASE + 5	/**< Invalid acceptance mode*/
+#define CARME_ERROR_CAN_ERROR_STATUS			CARME_ERROR_CAN_BASE + 6	/**< Status error			*/
 
 /* interrupt enable flags */
-#define CARME_CAN_INT_BUSERR		(SJA1000_IER_BEIE)	/**< \brief Bus Error Interrupt Enable			*/
-#define CARME_CAN_INT_ARBIT_LOST	(SJA1000_IER_ALIE)	/**< \brief Arbitration Lost Interrupt Enable	*/
-#define CARME_CAN_INT_PASSIVE		(SJA1000_IER_EPIE)	/**< \brief Error Passive Interrupt Enable		*/
-#define CARME_CAN_INT_WAKEUP		(SJA1000_IER_WUIE)	/**< \brief Wake-up Interrupt Enable			*/
-#define CARME_CAN_INT_OVERRUN		(SJA1000_IER_DOIE)	/**< \brief Data overrun Interrupt Enable		*/
-#define CARME_CAN_INT_ERROR			(SJA1000_IER_EIE)	/**< \brief Error Warning Interrupt Enable		*/
-#define CARME_CAN_INT_TX			(SJA1000_IER_TIE)	/**< \brief Transmit Interrupt Enable			*/
-#define CARME_CAN_INT_RX			(SJA1000_IER_RIE)	/**< \brief Receive Interrupt Enable			*/
+#define CARME_CAN_INT_BUSERR		(SJA1000_IER_BEIE)	/**< Bus Error Interrupt Enable			*/
+#define CARME_CAN_INT_ARBIT_LOST	(SJA1000_IER_ALIE)	/**< Arbitration Lost Interrupt Enable	*/
+#define CARME_CAN_INT_PASSIVE		(SJA1000_IER_EPIE)	/**< Error Passive Interrupt Enable		*/
+#define CARME_CAN_INT_WAKEUP		(SJA1000_IER_WUIE)	/**< Wake-up Interrupt Enable			*/
+#define CARME_CAN_INT_OVERRUN		(SJA1000_IER_DOIE)	/**< Data overrun Interrupt Enable		*/
+#define CARME_CAN_INT_ERROR			(SJA1000_IER_EIE)	/**< Error Warning Interrupt Enable		*/
+#define CARME_CAN_INT_TX			(SJA1000_IER_TIE)	/**< Transmit Interrupt Enable			*/
+#define CARME_CAN_INT_RX			(SJA1000_IER_RIE)	/**< Receive Interrupt Enable			*/
 
 /* driver flags */
 #define CARME_CAN_DF_RESET			0x00	/**< RM-Bit in MOD register set		*/
@@ -113,8 +113,7 @@ extern "C" {
 
 /*----- Data types ---------------------------------------------------------*/
 /**
- * \enum	CARME_CAN_IRQ_CALLBACKS
- * \brief	Interrupt sources of the CAN-Controller
+ * @brief	Interrupt sources of the CAN-Controller
  */
 enum CARME_CAN_IRQ_CALLBACKS {
 	CARME_CAN_IRQID_RX_INTERRUPT = 0,			/**< Telegram received Interrupt							*/
@@ -130,36 +129,32 @@ enum CARME_CAN_IRQ_CALLBACKS {
 };
 
 /**
- * \struct	_CARME_CAN_MESSAGE
- * \typedef	CARME_CAN_MESSAGE
- * \brief	This struct encapsulates a CAN message.
+ * @brief	This struct encapsulates a CAN message.
  */
 typedef struct _CARME_CAN_MESSAGE {
-	uint32_t id;		/**< standard or extended Identifier */
+	uint32_t id;		/**< standard or extended Identifier						*/
 	uint8_t ext;		/**< Frame format:
-							 \arg 0: Standard Frame Format (SFF)
-							 \arg 1: Extended Frame Format (EFF) */
-	uint8_t rtr;		/**< If 1 the RTR Bit was set in the received CAN message */
-	uint8_t dlc;		/**< Number of data-bytes in the received CAN message */
-	uint8_t data[8];	/**< Array with received databytes */
+							 @arg 0: Standard Frame Format (SFF)
+							 @arg 1: Extended Frame Format (EFF)					*/
+	uint8_t rtr;		/**< If 1 the RTR Bit was set in the received CAN message	*/
+	uint8_t dlc;		/**< Number of data-bytes in the received CAN message		*/
+	uint8_t data[8];	/**< Array with received databytes							*/
 } CARME_CAN_MESSAGE;
 
 /**
- * \enum	CARME_CAN_ACCEPTANCE_FILTER_MODE
- * \brief	Acceptance filter modes  \see CARME_CAN_setAcceptaceFilter()
+ * @brief	Acceptance filter modes
+ * @see		@ref CARME_CAN_SetAcceptaceFilter()
  */
 enum CARME_CAN_ACCEPTANCE_FILTER_MODE {
 	MODE_SINGLE = 1,	/**< single acceptance filter option is enabled
-							 (one filter with the length of 32 bits) */
+							 (one filter with the length of 32 bits)		*/
 	MODE_DUAL = 2		/**< dual acceptance filter option is enabled
-							 (two filters with the length of 16 bits) */
+							 (two filters with the length of 16 bits)		*/
 };
 
 /**
- * \struct	_CARME_CAN_ACCEPTANCE_FILTER
- * \typedef	CARME_CAN_ACCEPTANCE_FILTER
- * \brief	Information about the acceptance filter.
- * \see		CARME_CAN_setAcceptaceFilter()
+ * @brief	Information about the acceptance filter.
+ * @see		@ref CARME_CAN_SetAcceptaceFilter()
  */
 typedef struct _CARME_CAN_ACCEPTANCE_FILTER {
 	uint8_t acr[4];		/**< Content of the 4 Accept Filter Code Register	*/
@@ -168,8 +163,7 @@ typedef struct _CARME_CAN_ACCEPTANCE_FILTER {
 } CARME_CAN_ACCEPTANCE_FILTER;
 
 /**
- * \typedef	IRQ_CALLBACK
- * \brief	Pointer to a function.
+ * @brief	Pointer to a function.
  */
 typedef void (*IRQ_CALLBACK)();
 
@@ -196,6 +190,142 @@ extern void CARME_CAN_GetRegisterString(char* pStr);
 #endif
 
 /*----- Data ---------------------------------------------------------------*/
+static __IO uint8_t *SJA1000_CMD = (__IO uint8_t *) (FSMC_CAN_BASE);
+static __IO uint8_t *SJA1000_DATA = (__IO uint8_t *) (FSMC_CAN_BASE + 8);
+
+/*----- Implementation -----------------------------------------------------*/
+/**
+ * @brief		Write a value in a SJA1000 register.
+ * @param[in]	registerAddress		Address from the SJA1000 register.
+ * @param[in]	val					Value to write.
+ */
+static void CARME_CAN_Write_Register(uint8_t registerAddress, uint8_t val) {
+	*SJA1000_CMD = registerAddress;		/* write address					*/
+	*SJA1000_DATA = val;				/* write data						*/
+}
+
+/**
+ * @brief		Reads a value from a SJA1000 register.
+ * @param[in]	registerAddress		Address from the SJA1000 register.
+ * @return		error code
+ */
+static uint8_t CARME_CAN_Read_Register(uint8_t registerAddress) {
+	*SJA1000_CMD = registerAddress;		/* write address					*/
+	return *SJA1000_DATA;				/* read data						*/
+}
+
+/**
+ * @brief		Returns 1 if the CAN Controller is involved in bus
+ *				activities\n
+ *				The Function checks the BS-bit in the status register of the
+ *				SJA1000.
+ * @return		1 on bus-on
+ */
+static inline uint8_t CARME_CAN_IsBusOn(void) {
+	return (CARME_CAN_Read_Register(SJA1000_SR) & SJA1000_SR_BS) == 0;
+}
+
+/**
+ * @brief		Returns 1 if an data overrun occurred
+ *				The Function checks the DOS-bit in the status register of the
+ *				SJA1000.
+ * @return		1 on data overrun
+ */
+static inline uint8_t CARME_CAN_IsDataOverrun(void) {
+	return (CARME_CAN_Read_Register(SJA1000_SR) & SJA1000_SR_DOS)
+	        == SJA1000_SR_DOS;
+}
+
+/**
+ * @brief		Returns 1 if at least one of the error counters has reached
+ * 				or exceeded the value in the Error Warning Limit Register. \n
+ *				The Function checks the ES-bit in the status register of the
+ *				SJA1000.
+ * @return		1 on error
+ */
+static inline uint8_t CARME_CAN_IsError(void) {
+	return (CARME_CAN_Read_Register(SJA1000_SR) & SJA1000_SR_ES)
+			== SJA1000_SR_ES;
+}
+
+/**
+ * @brief		Clear Data-Overrun-Bit in the status register of the SJA1000
+ */
+static inline void CARME_CAN_ClearDataOverrun(void) {
+	CARME_CAN_Write_Register(SJA1000_CMR, SJA1000_CMR_CDO);	// set CDO-bit
+}
+
+/**
+ * @brief		Cancel a pending transmission request.
+ */
+static inline void CARME_CAN_AbortTransmisssion(void) {
+
+	CARME_CAN_Write_Register(SJA1000_CMR, SJA1000_CMR_AT);	// set At-bit
+}
+
+/**
+ * @brief		Set the value of the Error Warning Limit Register. The content
+ * 				can only be changed in reset mode.
+ * @param[in]	limit	The new content of the Error Warning Limit Register
+ * @return		Error code
+ */
+static inline ERROR_CODES CARME_CAN_SetErrorWarningLimit(uint8_t limit) {
+	ERROR_CODES err = CARME_NO_ERROR;
+
+	if (!(CARME_CAN_Read_Register(SJA1000_MOD) & SJA1000_MOD_RM)) {
+		err = CARME_ERROR_CAN_INVALID_OPMODE;
+	}
+	CARME_CAN_Write_Register(SJA1000_EWL, limit);
+
+	return err;
+}
+
+/**
+ * @brief		Get the value of the Error Warning Limit Register.
+ * @param[in]	limit	Pointer to a variable which will contain the content
+ *						of the Error Warning Limit Register
+ */
+static inline void CARME_CAN_GetErrorWarningLimit(uint8_t* limit) {
+	*limit = CARME_CAN_Read_Register(SJA1000_EWL);
+}
+
+/**
+ * @brief		Get the value of the RX Error Count Register.
+ * @param[in]	count	Pointer to a variable which will contain the content
+ *						of the RX Error Count Register
+ */
+static inline void CARME_CAN_GetRxErrCount(uint8_t* count) {
+	*count = CARME_CAN_Read_Register(SJA1000_RXERR);
+}
+
+/**
+ * @brief		Get the value of the TX Error Count Register.
+ * @param[in]	count	Pointer to a variable which will contain the content
+ *						of the TX Error Count Register.
+ */
+static inline void CARME_CAN_GetTxErrCount(uint8_t* count) {
+
+	*count = CARME_CAN_Read_Register(SJA1000_TXERR);
+}
+
+/**
+ * @brief		Get the value of the TX Error Count Register.
+ * @param[in]	alc		Pointer to a variable which will contain the content
+ *						of the Arbitration Lost Capture Register.
+ */
+static inline void CARME_CAN_GetArbitrationLostCapture(uint8_t* alc) {
+	*alc = CARME_CAN_Read_Register(SJA1000_ALC);
+}
+
+/**
+ * @brief		Get the value of the TX Error Count Register.
+ * @param[in]	ecc		Pointer to a variable which will contain the content
+ *						of the Error Code Capture Register.
+ */
+static inline void CARME_CAN_GetErrorCodeCapture(uint8_t* ecc) {
+
+	*ecc = CARME_CAN_Read_Register(SJA1000_ECC);
+}
 
 #ifdef __cplusplus
 }

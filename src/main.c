@@ -33,6 +33,7 @@
 #include <queue.h>					/* FreeRTOS queues						*/
 #include <semphr.h>					/* FreeRTOS semaphores					*/
 #include <memPoolService.h>			/* Memory pool manager service			*/
+#include <lift.h>
 
 /*----- Macros -------------------------------------------------------------*/
 
@@ -55,6 +56,7 @@ xQueueHandle     Queue_Can_Rx;
  */
 int main(void)
 {
+
 	/* Ensure all priority bits are assigned as preemption priority bits. */
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 
@@ -62,6 +64,7 @@ int main(void)
 	Muxtex_Can_Tx  = xSemaphoreCreateMutex();
 	Muxtex_Display = xSemaphoreCreateMutex();
 	Queue_Can_Rx   = xQueueCreate(20, sizeof (CARME_CAN_MESSAGE *));
+
 
 	/* initialize the LCD display */
 	LCD_Init();
@@ -74,6 +77,17 @@ int main(void)
 	CARME_CAN_SetMode(CARME_CAN_DF_NORMAL);
 
 	/* create tasks */
+
+///////////////////////////////////////////////////////////////////////////
+
+	xTaskCreate(lift,(const signed char * const)"lift",  1024, NULL, 4, NULL);
+
+	//QueueHandle_t xQueueDirection;
+	//QueueHandle_t xQueuePosition;
+
+	//xQueueDirection = xQueueCreate( 10, sizeof( unsigned int ) );
+	//xQueuePosition = xQueueCreate( 10, sizeof( unsigned int ) );
+///////////////////////////////////////////////////////////////////////////
 	xTaskCreate(sendCanMessage,  (const signed char * const)"Send Can Message",  1024, NULL, 4, NULL);
 	xTaskCreate(writeCanMessage, (const signed char * const)"Write Can Message", 1024, NULL, 4, NULL);
 

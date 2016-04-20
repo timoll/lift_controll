@@ -386,7 +386,7 @@ extern "C" {
  * \arg 0:		Disable
  * \arg >=1:	Enable
  */
-#define	_FS_LOCK	1
+#define	_FS_LOCK	8
 
 #ifdef __cplusplus
 }

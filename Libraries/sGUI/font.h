@@ -108,9 +108,7 @@ extern "C" {
 
 /*----- Data types ---------------------------------------------------------*/
 /**
- * \struct	_FONT_T
- * \typedef	FONT_T
- * \brief	This struct encapsulates the parameters of a font.
+ * @brief	This struct encapsulates the parameters of a font.
  */
 typedef struct _FONT_T {
 	uint8_t width;			/**< Font width in pixel		*/
@@ -124,115 +122,119 @@ typedef struct _FONT_T {
 /*----- Data ---------------------------------------------------------------*/
 #ifdef FONT_4x6
 /* -Misc-Fixed-Medium-R-Normal--6-60-75-75-C-40-ISO10646-1					*/
-FONT_T font_4x6;
+extern FONT_T font_4x6;
 #endif /* FONT_4x6 */
 
 #ifdef FONT_5x7
 /* -Misc-Fixed-Medium-R-Normal--7-70-75-75-C-50-ISO10646-1					*/
-FONT_T font_5x7;
+extern FONT_T font_5x7;
 #endif /* FONT_5x7 */
 
 #ifdef FONT_5x7W
-FONT_T font_5x7W;
+extern FONT_T font_5x7W;
 #endif /* FONT_5x7W */
 
 #ifdef FONT_5x8
 /* -Misc-Fixed-Medium-R-Normal--8-80-75-75-C-50-ISO10646-1					*/
-FONT_T font_5x8;
+extern FONT_T font_5x8;
 #endif /* FONT_5x8 */
 
 #ifdef FONT_6x9
 /* -Misc-Fixed-Medium-R-Normal--9-90-75-75-C-60-ISO10646-1					*/
-FONT_T font_6x9;
+extern FONT_T font_6x9;
 #endif /* FONT_6x9 */
 
 #ifdef FONT_6x10
 /* -Misc-Fixed-Medium-R-Normal--10-100-75-75-C-60-ISO10646-1				*/
-FONT_T font_6x10;
+extern FONT_T font_6x10;
 #endif /* FONT_6x10 */
 
 #ifdef FONT_6x12
 /* -Misc-Fixed-Medium-R-SemiCondensed--12-110-75-75-C-60-ISO10646-1			*/
-FONT_T font_6x12;
+extern FONT_T font_6x12;
 #endif /* FONT_6x12 */
 
 #ifdef FONT_6x13
 /* -Misc-Fixed-Medium-R-SemiCondensed--13-120-75-75-C-60-ISO10646-1			*/
-FONT_T font_6x13;
+extern FONT_T font_6x13;
 #endif /* FONT_6x13 */
 
 #ifdef FONT_6x13B
 /* -Misc-Fixed-Bold-R-SemiCondensed--13-120-75-75-C-60-ISO10646-1			*/
-FONT_T font_6x13B;
+extern FONT_T font_6x13B;
 #endif /* FONT_6x13B */
 
 #ifdef FONT_6x13O
 /* -Misc-Fixed-Medium-O-SemiCondensed--13-120-75-75-C-60-ISO10646-1			*/
-FONT_T font_6x13O;
+extern FONT_T font_6x13O;
 #endif /* FONT_6x13O */
 
 #ifdef FONT_7x13
 /* -Misc-Fixed-Medium-R-Normal--13-120-75-75-C-70-ISO10646-1				*/
-FONT_T font_7x13;
+extern FONT_T font_7x13;
 #endif /* FONT_7x13 */
 
 #ifdef FONT_7x13B
 /* -Misc-Fixed-Bold-R-Normal--13-120-75-75-C-70-ISO10646-1					*/
-FONT_T font_7x13B;
+extern FONT_T font_7x13B;
 #endif /* FONT_7x13B */
 
 #ifdef FONT_7x13O
 /* -Misc-Fixed-Medium-O-Normal--13-120-75-75-C-70-ISO10646-1				*/
-FONT_T font_7x13O;
+extern FONT_T font_7x13O;
 #endif /* FONT_7x13O */
 
 #ifdef FONT_7x14
 /* -Misc-Fixed-Medium-R-Normal--14-130-75-75-C-70-ISO10646-1				*/
-FONT_T font_7x14;
+extern FONT_T font_7x14;
 #endif /* FONT_7x14 */
 
 #ifdef FONT_7x14B
 /* -Misc-Fixed-Bold-R-Normal--14-130-75-75-C-70-ISO10646-1					*/
-FONT_T font_7x14B;
+extern FONT_T font_7x14B;
 #endif /* FONT_7x14B */
 
 #ifdef FONT_8x8
-FONT_T font_8x8;
+extern FONT_T font_8x8;
 #endif /* FONT_8x8 */
 
 #ifdef FONT_8x13
 /* -Misc-Fixed-Medium-R-Normal--13-120-75-75-C-80-ISO10646-1				*/
-FONT_T font_8x13;
+extern FONT_T font_8x13;
 #endif /* FONT_8x13 */
 
 #ifdef FONT_8x13B
 /* -Misc-Fixed-Bold-R-Normal--13-120-75-75-C-80-ISO10646-1					*/
-FONT_T font_8x13B;
+extern FONT_T font_8x13B;
 #endif /* FONT_8x13B */
 
 #ifdef FONT_8x13O
 /* -Misc-Fixed-Medium-O-Normal--13-120-75-75-C-80-ISO10646-1				*/
-FONT_T font_8x13O;
+extern FONT_T font_8x13O;
 #endif /* FONT_8x13O */
 
 #ifdef FONT_8x16
 /* -Sony-Fixed-Medium-R-Normal--16-120-100-100-C-80-ISO8859-1				*/
-FONT_T font_8x16;
+extern FONT_T font_8x16;
 #endif /* FONT_8x16 */
 
 #ifdef FONT_8x16B
-FONT_T font_8x16B;
+extern FONT_T font_8x16B;
 #endif /* FONT_8x16B */
 
 #ifdef FONT_9x15
 /* -Misc-Fixed-Medium-R-Normal--15-140-75-75-C-90-ISO10646-1				*/
-FONT_T font_9x15;
+extern FONT_T font_9x15;
 #endif /* FONT_9x15 */
 
 #ifdef FONT_9x15B
 /* -Misc-Fixed-Bold-R-Normal--15-140-75-75-C-90-ISO10646-1					*/
-FONT_T font_9x15B;
+extern FONT_T font_9x15B;
 #endif /* FONT_9x15B */
+
+/*----- Implementation -----------------------------------------------------*/
+
+/*----- EOF ----------------------------------------------------------------*/
 
 #ifdef __cplusplus
 }
