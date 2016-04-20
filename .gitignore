@@ -30,6 +30,7 @@
 
 # Debug files
 *.dSYM/
+*.map
 
 #TrueStudio
 .settings
@@ -37,3 +38,7 @@ Debug/
 Libraries/
 .cproject
 .project
+.code_review_properties
+.DS_Store
+*.launch
+
