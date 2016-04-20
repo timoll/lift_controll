@@ -36,4 +36,6 @@ extern xSemaphoreHandle Sema_Arm_Links_Start;
 extern xSemaphoreHandle Sema_Arm_Rechts_Start;
 extern xSemaphoreHandle Sema_Split_Start;
 
+#include <task_communication.h>
+
 #endif /* MAIN_H_ */
