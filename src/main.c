@@ -33,6 +33,7 @@
 #include <queue.h>					/* FreeRTOS queues						*/
 #include <semphr.h>					/* FreeRTOS semaphores					*/
 #include <memPoolService.h>			/* Memory pool manager service			*/
+#include "task_communication.h"
 
 /*----- Macros -------------------------------------------------------------*/
 
@@ -59,6 +60,7 @@ int main(void)
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 
 	/* initialize the mutex variables */
+
 	Muxtex_Can_Tx  = xSemaphoreCreateMutex();
 	Muxtex_Display = xSemaphoreCreateMutex();
 	Queue_Can_Rx   = xQueueCreate(20, sizeof (CARME_CAN_MESSAGE *));
@@ -67,11 +69,18 @@ int main(void)
 	LCD_Init();
 	LCD_SetFont(&font_8x16);
 	LCD_DisplayStringXY(10, 10, "Can Template CARME-M4");
-
+	int queueError = initQueues();
+		if(queueError != 0) {
+			char errorMessage[35];
+			sprintf(errorMessage,"Error initializing queue: %x", queueError);
+			fprintf(stderr, errorMessage);
+			LCD_DisplayStringXY(10, 30, errorMessage);
+		}
 	/* initialize the CAN interface */
 	CARME_CAN_InitI(CARME_CAN_BAUD_250K, CARME_CAN_DF_RESET, CARME_CAN_INT_RX);
 	CARME_CAN_RegisterIRQCallback(CARME_CAN_IRQID_RX_INTERRUPT, readCanMessageIRQ);
 	CARME_CAN_SetMode(CARME_CAN_DF_NORMAL);
+
 
 	/* create tasks */
 	xTaskCreate(sendCanMessage,  (const signed char * const)"Send Can Message",  1024, NULL, 4, NULL);
