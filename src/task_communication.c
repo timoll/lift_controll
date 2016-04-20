@@ -7,7 +7,7 @@
 #include "task_communication.h"
 int initQueues()
 {
-	int error;
+	int error=0;
 
 	_canToLift = xQueueCreate( 20, sizeof(CARME_CAN_MESSAGE) );
 	_canToController = xQueueCreate( 20, sizeof(CARME_CAN_MESSAGE) );
