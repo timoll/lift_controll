@@ -30,6 +30,7 @@
 
 # Debug files
 *.dSYM/
+*.map
 
 #TrueStudio
 .settings
