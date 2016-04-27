@@ -18,22 +18,13 @@
 #include <task_communication.h>
 
 //Data
-int messageLength=4;
-int levelB;
-int levelA;
-int almost_A;
-int almost_B;
-int liftName;
+
 CARME_CAN_MESSAGE msg;
 
 //Defines
-
 #define DOWN 	0
 #define UP 		1
 #define STILL 	2
-
-
-
 
 #define motorA 		0x00
 #define motorB 		0x01
