@@ -34,6 +34,7 @@
 #include <semphr.h>					/* FreeRTOS semaphores					*/
 #include <memPoolService.h>			/* Memory pool manager service			*/
 #include "task_communication.h"
+#include "lift.h"
 
 /*----- Macros -------------------------------------------------------------*/
 

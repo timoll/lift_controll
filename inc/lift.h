@@ -50,16 +50,16 @@ CARME_CAN_MESSAGE msg;
 
 
 //Function Prototype
-extern void openDoor(int address);
-extern void closeDoor(int address);
-extern void stoppDoor(int address);
-extern void reachedDestination(int address);
-extern void allmostReachedUp(int address);
-extern void allmostReachedDown(int address);
-extern void moveUp(int address);
-extern void moveDown(int address);
+ void openDoor(int address);
+ void closeDoor(int address);
+ void stoppDoor(int address);
+ void reachedDestination(int address);
+ void allmostReachedUp(int address);
+ void allmostReachedDown(int address);
+ void moveUp(int address);
+ void moveDown(int address);
+ void getInformation(void);
 
-extern void getInformation(void);
 extern void lift(void *pvargs);
 
 

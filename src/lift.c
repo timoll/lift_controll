@@ -7,6 +7,10 @@
 //include
 #include "lift.h"
 
+//Lift A odr Beide
+//#define LIFT_B
+
+
 //Data
 int endschalterA;
 int endschalterB;
@@ -19,6 +23,7 @@ int directionB=STILL;//Variable to store the actual direction
 
 int StoppLevelA[5];
 int StoppLevelB[5];
+int queueTime=10;
 
 int acceptedA=0, acceptedB=0;
 
@@ -33,7 +38,7 @@ void getInformation(void)
 {
 	CARME_CAN_MESSAGE receivedMessage;
 	//Set Endschalter!!!
-	xQueueReceive(_canToLift,&receivedMessage, 0); //write the contant into receivedMessage
+	xQueueReceive(_canToLift,&receivedMessage, queueTime); //write the contant into receivedMessage
 	liftName = receivedMessage.id %2; //find out which elevator is meant
 	switch (liftName)
 	{
@@ -94,7 +99,7 @@ void openDoor(int address)//Choose which floor
 		msg.data[i] = 0x00;
 	}
 	msg.data[4]=0x5;//open & fast
-	xQueueSend(_liftToCan,&msg,10);
+	xQueueSend(_liftToCan,&msg,queueTime);
 }
 void closeDoor(int address)//Choose which floor
 {
@@ -113,7 +118,7 @@ void closeDoor(int address)//Choose which floor
 		msg.data[i] = 0x00;
 	}
 	msg.data[4]=0x02;// close & slow
-	xQueueSend(_liftToCan,&msg,10);
+	xQueueSend(_liftToCan,&msg,queueTime);
 }
 void stoppDoor(int address)//Choose which floor
 {
@@ -131,8 +136,9 @@ void stoppDoor(int address)//Choose which floor
 	{
 		msg.data[i] = 0x00;// stopp Door
 	}
-	xQueueSend(_liftToCan,&msg,10);
+	xQueueSend(_liftToCan,&msg,queueTime);
 }
+
 void reachedDestination(int address)//Choose which motor
 {
 	/*
@@ -168,7 +174,7 @@ void allmostReachedUp(int address)//Choose which motor
 			msg.data[i] = 0x00;
 		}
 		msg.data[2]=0x02;//up & slow
-		xQueueSend(_liftToCan,&msg,10);
+		xQueueSend(_liftToCan,&msg,queueTime);
 }
 void allmostReachedDown(int address)//Choose which motor
 {
@@ -189,6 +195,7 @@ void allmostReachedDown(int address)//Choose which motor
 		msg.data[2]=0x05;//down & slow
 		xQueueSend(_liftToCan,&msg,10);
 }
+
 void moveUp(int address)//Choose which motor
 {
 	/*
@@ -206,7 +213,7 @@ void moveUp(int address)//Choose which motor
 		msg.data[i] = 0x00;
 	}
 	msg.data[2]=0x04;//up & fast
-	xQueueSend(_liftToCan,&msg,10);
+	xQueueSend(_liftToCan,&msg,queueTime);
 }
 void moveDown(int address)//Choose which motor
 {
@@ -225,10 +232,8 @@ void moveDown(int address)//Choose which motor
 		msg.data[i] = 0x00;
 	}
 	msg.data[3]=0x05;//down & fast
-	xQueueSend(_liftToCan,&msg,10);
+	xQueueSend(_liftToCan,&msg,queueTime);
 }
-
-
 
 void addJobA(Job newJob, int level)
 {
@@ -247,7 +252,7 @@ void sendJobA(int level)
 	for(i=0;i<5;i++)
 	{
 		acceptedJobA[level-1][i].success=1; //set Succes bit
-		xQueueSend(_liftAToController, &acceptedJobA[level-1][i],10);//inform the Controller
+		xQueueSend(_liftAToController, &acceptedJobA[level-1][i],queueTime);//inform the Controller
 		acceptedJobA[level-1][i]=noJob;//erase all Jobs done
 	}
 	acceptedA=0;//set counter to Zero
@@ -258,10 +263,47 @@ void sendJobB(int level)
 	for(i=0;i<5;i++)
 	{
 		acceptedJobB[level-1][i].success=1; //set Succes bit
-		xQueueSend(_liftBToController, &acceptedJobB[level-1][i],10);//inform the Controller
+		xQueueSend(_liftBToController, &acceptedJobB[level-1][i],queueTime);//inform the Controller
 		acceptedJobB[level-1][i]=noJob;//erase all Jobs done
 	}
 	acceptedB=0;//set counter to Zero
+}
+
+int initLiftA(void)
+{
+	int finished=0;
+	moveDown(motorA);
+
+	while(finished!=1)
+	{
+		getInformation();
+
+		if((levelA==1)&&(endschalterA == 0x01))
+		{
+			reachedDestination(motorA);//turn off motorA
+			finished=1;
+		}
+	}
+	return finished;
+
+
+}
+int initLiftB(void)
+{
+	int finished=0;
+	moveDown(motorB);
+
+	while(finished!=1)
+	{
+		getInformation();
+
+		if((levelB==1)&&(endschalterB == 0x01))
+		{
+			reachedDestination(motorB);//turn off motorB
+			finished=1;
+		}
+	}
+	return finished;
 }
 
 //Task-Code
@@ -271,6 +313,8 @@ void lift(void *pvargs)
 	Job RXJobB;
 	Job TXJobA;
 	Job TXJobB;
+	initLiftA();
+	initLiftB();
 
 	for(;;)
 	{
@@ -337,6 +381,7 @@ void lift(void *pvargs)
 			}
 		 }
 
+#ifndef LIFT_B
 		//1b)-------------------------------------------------------------------------------------------------------------------------
 		 if( xQueueReceive( _controllerToLiftB, &RXJobB ,  10 )) //writes the Message of the queue into RXJobB
 		 {
@@ -388,7 +433,7 @@ void lift(void *pvargs)
 				}
 			}
 		 }
-
+#endif //LIFT_B
 		 //2a)-------------------------------------------------------------------------------------------------------------------------
 		if((endschalterA == 0x02) && (StoppLevelA[almost_A-1] == 1) && (directionA == UP))//almost reached and near-switch pressed
 		{
@@ -399,7 +444,7 @@ void lift(void *pvargs)
 		{
 			allmostReachedDown(motorA);
 		}
-
+#ifndef LIFT_B
 		 //2b)-------------------------------------------------------------------------------------------------------------------------
 		if((endschalterB == 0x02) && (StoppLevelB[almost_B-1] == 1) && (directionB == UP))//almost reached and near-switch pressed
 		{
@@ -410,6 +455,7 @@ void lift(void *pvargs)
 		{
 			allmostReachedDown(motorB);
 		}
+#endif //LIFT_B
 		//3a)-------------------------------------------------------------------------------------------------------------------------
 		if((endschalterA == 0x01) && (StoppLevelA[levelA-1] == 1))// reached and StoppLevelA Bit is (set LevelA-1) is necessary because the first level is 1, but I need an Index of 0
 		{
@@ -479,7 +525,7 @@ void lift(void *pvargs)
 			StoppLevelA[levelA-1]=0; //erase the Bit because the Job is done
 			sendJobA(levelA);//Inform of the finished Jobs
 		}
-
+#ifndef LIFT_B
 		//3b)-------------------------------------------------------------------------------------------------------------------------
 		if((endschalterB == 0x01) && (StoppLevelB[levelB-1] == 1))// reached destination
 		{
@@ -548,6 +594,7 @@ void lift(void *pvargs)
 			StoppLevelB[levelB-1]=0; //erase the Bit because the Job is done
 			sendJobB(levelB);
 		}
+#endif //LIFT_B
 		vTaskDelay(35);
 	}
 }
