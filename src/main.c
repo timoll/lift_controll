@@ -77,7 +77,7 @@ int main(void)
 			LCD_DisplayStringXY(10, 30, errorMessage);
 		}
 	/* initialize the CAN interface */
-	CARME_CAN_InitI(CARME_CAN_BAUD_250K, CARME_CAN_DF_RESET, CARME_CAN_INT_RX);
+	CARME_CAN_InitI(CARME_CAN_BAUD_125K, CARME_CAN_DF_RESET, CARME_CAN_INT_RX);
 	CARME_CAN_RegisterIRQCallback(CARME_CAN_IRQID_RX_INTERRUPT, readCanMessageIRQ);
 	CARME_CAN_SetMode(CARME_CAN_DF_NORMAL);
 
@@ -96,74 +96,74 @@ int main(void)
 /**
  * @brief		task sendCanMessage
  */
-void sendCanMessage (void *pvargs) {
-	int i;
-	CARME_CAN_MESSAGE msg;
-
-	for(;;) {
-		msg.id  = 0x100;
-		msg.ext = 0;
-		msg.rtr = 0;
-		msg.dlc = 8;
-
-		for (i = 0; i < 8; i++) {
-			msg.data[i] = i * 0x11;
-		}
-
-		xSemaphoreTake(Muxtex_Can_Tx, portMAX_DELAY);
-		CARME_CAN_Write(&msg);
-		xSemaphoreGive(Muxtex_Can_Tx);
-
-		vTaskDelay(1000/portTICK_RATE_MS);
-	}
-}
+//void sendCanMessage (void *pvargs) {
+//	int i;
+//	CARME_CAN_MESSAGE msg;
+//
+//	for(;;) {
+//		msg.id  = 0x100;
+//		msg.ext = 0;
+//		msg.rtr = 0;
+//		msg.dlc = 8;
+//
+//		for (i = 0; i < 8; i++) {
+//			msg.data[i] = i * 0x11;
+//		}
+//
+//		xSemaphoreTake(Muxtex_Can_Tx, portMAX_DELAY);
+//		CARME_CAN_Write(&msg);
+//		xSemaphoreGive(Muxtex_Can_Tx);
+//
+//		vTaskDelay(1000/portTICK_RATE_MS);
+//	}
+//}
 
 /**
  * @brief		task writeCanMessage
  */
-void writeCanMessage (void *pvargs) {
-	CARME_CAN_MESSAGE *pMsg;
-	char text [60];
-	int i;
-
-	for(;;) {
-		xQueueReceive(Queue_Can_Rx, &pMsg, portMAX_DELAY);
-		// set the unused transmitted data bytes to 0
-		for (i = pMsg->dlc; i < 8; i++) {
-			pMsg->data[i] = 0;
-		}
-		sprintf(text, "ID=%xh,DLC=%d,Data=%xh,%xh,%xh,%xh,%xh,%xh,%xh,%xh",
-				       (unsigned)pMsg->id, pMsg->dlc,
-				       pMsg->data[0], pMsg->data[1], pMsg->data[2], pMsg->data[3],
-				       pMsg->data[4], pMsg->data[5], pMsg->data[6], pMsg->data[7]);
-		xSemaphoreTake(Muxtex_Display, portMAX_DELAY);
-		LCD_SetFont(&font_8x13);
-		LCD_DisplayStringXY(10, 30, "New Can Message received");
-		LCD_SetFont(&font_5x8);
-		LCD_DisplayStringXY(10, 50, text);
-		xSemaphoreGive(Muxtex_Display);
-		free(pMsg);
-	}
-}
+//void writeCanMessage (void *pvargs) {
+//	CARME_CAN_MESSAGE *pMsg;
+//	char text [60];
+//	int i;
+//
+//	for(;;) {
+//		xQueueReceive(Queue_Can_Rx, &pMsg, portMAX_DELAY);
+//		// set the unused transmitted data bytes to 0
+//		for (i = pMsg->dlc; i < 8; i++) {
+//			pMsg->data[i] = 0;
+//		}
+//		sprintf(text, "ID=%xh,DLC=%d,Data=%xh,%xh,%xh,%xh,%xh,%xh,%xh,%xh",
+//				       (unsigned)pMsg->id, pMsg->dlc,
+//				       pMsg->data[0], pMsg->data[1], pMsg->data[2], pMsg->data[3],
+//				       pMsg->data[4], pMsg->data[5], pMsg->data[6], pMsg->data[7]);
+//		xSemaphoreTake(Muxtex_Display, portMAX_DELAY);
+//		LCD_SetFont(&font_8x13);
+//		LCD_DisplayStringXY(10, 30, "New Can Message received");
+//		LCD_SetFont(&font_5x8);
+//		LCD_DisplayStringXY(10, 50, text);
+//		xSemaphoreGive(Muxtex_Display);
+//		free(pMsg);
+//	}
+//}
 
 /**
  * @brief		IRQ readCanMessageIRQ
  */
-void readCanMessageIRQ () {
-	CARME_CAN_MESSAGE *pMsg;
-	ERROR_CODES error;
-
-	pMsg = malloc (sizeof (CARME_CAN_MESSAGE));
-
-	if (pMsg != NULL) {
-        // read the new message
-		error = CARME_CAN_Read(pMsg);
-
-		if (error == CARME_NO_ERROR) {
-			xQueueSend(Queue_Can_Rx, &pMsg, portMAX_DELAY);
-		}
-		else {
-			free (pMsg);
-		}
-	}
-}
+//void readCanMessageIRQ () {
+//	CARME_CAN_MESSAGE *pMsg;
+//	ERROR_CODES error;
+//
+//	pMsg = malloc (sizeof (CARME_CAN_MESSAGE));
+//
+//	if (pMsg != NULL) {
+//        // read the new message
+//		error = CARME_CAN_Read(pMsg);
+//
+//		if (error == CARME_NO_ERROR) {
+//			xQueueSend(Queue_Can_Rx, &pMsg, portMAX_DELAY);
+//		}
+//		else {
+//			free (pMsg);
+//		}
+//	}
+//}

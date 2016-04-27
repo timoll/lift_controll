@@ -11,8 +11,7 @@ int initQueues()
 
 	_canToLift = xQueueCreate( 20, sizeof(CARME_CAN_MESSAGE) );
 	_canToController = xQueueCreate( 20, sizeof(CARME_CAN_MESSAGE) );
-	_liftToCan = xQueueCreate( 20, sizeof(CARME_CAN_MESSAGE) );
-	_controllerToCan = xQueueCreate( 20, sizeof(CARME_CAN_MESSAGE) );
+	_toCan = xQueueCreate( 20, sizeof(CARME_CAN_MESSAGE) );
 
 	_controllerToLiftA = xQueueCreate( 20, sizeof(Job) );
 	_controllerToLiftB = xQueueCreate( 20, sizeof(Job) );
@@ -25,11 +24,8 @@ int initQueues()
 	if( _canToController == 0 ) {
 		error|=0x02;
 	}
-	if( _liftToCan == 0 ) {
+	if( _toCan == 0 ) {
 		error|=0x04;
-	}
-	if( _controllerToCan == 0 ) {
-		error|=0x08;
 	}
 	if( _controllerToLiftA == 0 ) {
 		error|=0x10;
