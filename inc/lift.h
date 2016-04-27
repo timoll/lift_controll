@@ -15,6 +15,7 @@
 #include <queue.h>
 #include <stdbool.h>
 #include <lcd.h>
+#include <task_communication.h>
 
 //Data
 int messageLength=4;
@@ -58,10 +59,7 @@ extern void allmostReachedDown(int address);
 extern void moveUp(int address);
 extern void moveDown(int address);
 
-extern void setLevel(void);
-extern void getSchalterByte(void);
-extern void getEndSchalterByte(void);
-
+extern void getInformation(void);
 extern void lift(void *pvargs);
 
 
