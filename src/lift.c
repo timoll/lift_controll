@@ -21,8 +21,13 @@ int acceptedA=0, acceptedB=0;
 int directionA=STILL;//Variable to store the actual direction
 int directionB=STILL;//Variable to store the actual direction
 
+int posLifty=10;
+int posLiftx=10;
+
 int StoppLevelA[5];//indicates the floors where the elevator needs to stopp
 int StoppLevelB[5];//indicates the floors where the elevator needs to stopp
+
+char liftString[40];
 
 //Settings
 int queueTime=10;
@@ -311,6 +316,7 @@ int initLiftB(void)
 //Task-Code
 void lift(void *pvargs)
 {
+
 	//used for saving the current job received from controller
 	Job RXJobA;
 	Job RXJobB;
@@ -322,6 +328,9 @@ void lift(void *pvargs)
 
 	for(;;){
 		getInformation();
+		sprintf(liftString, "endA:%x, endB:%x levelA:%d  LevelB:%d", endschalterA, endschalterB, levelA, levelB);
+		LCD_DisplayStringXY(posLiftx, posLifty,liftstring);
+
 
 		//Procedure
 		//1)check for job + set the Levels where I need to stop + set Direction + answer which job has NOT been accepted
@@ -365,6 +374,8 @@ void lift(void *pvargs)
 					moveDown(motorA);
 				}
 			}
+			sprintf(liftString, "DirectionA:%d", directionA);
+			LCD_DisplayStringXY(posLiftx, posLifty,liftstring);
 		 }
 
 #ifndef LIFT_B
@@ -404,6 +415,8 @@ void lift(void *pvargs)
 					moveDown(motorB);
 				}
 			}
+			sprintf(liftString, "DirectionA:%d, DirectionB:%d", directionA, directionB);
+			LCD_DisplayStringXY(posLiftx, posLifty,liftstring);
 		 }
 #endif //LIFT_B
 
@@ -452,9 +465,12 @@ void lift(void *pvargs)
 				if(AstillMoveUP==1){
 					directionA=UP;//set Direction
 					moveUp(motorA);//move elavator
+					LCD_DisplayStringXY(posLiftx, posLifty,"                                   ");//erase all characters left
+					LCD_DisplayStringXY(posLiftx, posLifty,"A still move up ");
 				}
 				if(AstillMoveUP==0){
 					directionA=STILL;
+					LCD_DisplayStringXY(posLiftx, posLifty,"still           ");
 				}
 			}
 			if(directionA==DOWN){
@@ -470,14 +486,18 @@ void lift(void *pvargs)
 				if(AstillMoveDOWN==1){
 					directionA=DOWN;//set Direction
 					moveDown(motorA);//move elavator
+					LCD_DisplayStringXY(posLiftx, posLifty,"                                   ");//erase all characters left
+					LCD_DisplayStringXY(posLiftx, posLifty,"still move down");
 				}
 				if(AstillMoveDOWN==0){
 					directionA=STILL;
+					LCD_DisplayStringXY(posLiftx, posLifty,"still             ");
 				}
 			}
 			//Job is done
 			StoppLevelA[levelA-1]=0; //erase the Bit because the Job is done
 			sendJobA(levelA-1);//Inform of the finished Jobs
+			LCD_DisplayStringXY(posLiftx, posLifty,"A reached destination");
 		}
 #ifndef LIFT_B
 		//3b)-------------------------------------------------------------------------------------------------------------------------
@@ -506,9 +526,12 @@ void lift(void *pvargs)
 				if(BstillMoveUP==1){
 					directionB=UP;//set Direction
 					moveUp(motorB);//move elavator
+					LCD_DisplayStringXY(posLiftx, posLifty,"                                   ");//erase all characters left
+					LCD_DisplayStringXY(posLiftx, posLifty,"B still move up ");
 				}
 				if(BstillMoveUP==0){
 					directionB=STILL;
+					LCD_DisplayStringXY(posLiftx, posLifty,"still           ");
 				}
 			}
 			if(directionB==DOWN){
@@ -525,14 +548,18 @@ void lift(void *pvargs)
 				if(BstillMoveDOWN==1){
 					directionB=DOWN;//set Direction
 					moveDown(motorB);//move elavator
+					LCD_DisplayStringXY(posLiftx, posLifty,"                                   ");//erase all characters left
+					LCD_DisplayStringXY(posLiftx, posLifty,"B still move down ");
 				}
 				if(BstillMoveDOWN==0){
 					directionB=STILL;
+					LCD_DisplayStringXY(posLiftx, posLifty,"still           ");
 				}
 			}
 			//Job is done
 			StoppLevelB[levelB-1]=0; //erase the Bit because the Job is done
 			sendJobB(levelB-1);
+			LCD_DisplayStringXY(posLiftx, posLifty,"B reached destination");
 		}
 #endif //LIFT_B
 		vTaskDelay(35);
