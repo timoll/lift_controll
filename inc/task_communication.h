@@ -6,8 +6,7 @@
 
 xQueueHandle _canToLift;
 xQueueHandle _canToController;
-xQueueHandle _liftToCan;
-xQueueHandle _controllerToCan;
+xQueueHandle _toCan;
 
 xQueueHandle _controllerToLiftA;
 xQueueHandle _controllerToLiftB;

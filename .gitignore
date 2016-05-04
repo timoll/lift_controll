@@ -36,6 +36,8 @@
 .settings
 Debug/
 Libraries/
+build/
+utils/
 .cproject
 .project
 .code_review_properties
