@@ -15,7 +15,7 @@
 void readCanMessageIRQ () {
 	CARME_CAN_MESSAGE msg;
 	ERROR_CODES error;
-
+	for(;;){
 		error = CARME_CAN_Read(&msg);
 
 		if (error == CARME_NO_ERROR) {
@@ -28,6 +28,7 @@ void readCanMessageIRQ () {
 				xQueueSendFromISR(_canToController, &msg, portMAX_DELAY);
 			}
 		}
+	}
 }
 void sendCanMessage(){
 	CARME_CAN_MESSAGE msg;
