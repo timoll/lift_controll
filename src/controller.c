@@ -47,16 +47,16 @@
 
 typedef enum _lift { Lift1, Lift2, Outside  } TaskSource;
 typedef struct _orders{
-	int Floor=-1;
-	int Direction=-1;
-	int Lift =-1;
-	int Id=-1;
+	int Floor;
+	int Direction;
+	int Lift;
+	int Id;
 }Order;
 
 Order Pending_orders [Max];
 Order Jobs_inprogress_lift_1 [Max];
 Order Jobs_inprogress_lift_2 [Max];
-const Order noOrder;
+const Order noOrder={-1,-1,-1,-1};
 int currentId=0;
 char possible_floors_lift_1[2];
 char possible_floors_lift_2[2];
@@ -81,7 +81,7 @@ Job recJob = {0,0,0};
 /*----- Function prototypes ------------------------------------------------*/
 
 
-char Find_direction (char p[][2],char last_position);
+char Find_direction (Order p[],char last_position);
 char Array_arrange_4 (Order p[]);
 int checkValidOrder(Order order);
 
@@ -96,8 +96,8 @@ void controller(void)
 	{
 		case Inform:
 
-			direction_lift_1=Find_direction(Jobs_inprogress_lift_1[0][0],last_position_lift_1);
-			direction_lift_2=Find_direction(Jobs_inprogress_lift_2[0][0],last_position_lift_2);
+			direction_lift_1=Find_direction(Jobs_inprogress_lift_1,last_position_lift_1);
+			direction_lift_2=Find_direction(Jobs_inprogress_lift_2,last_position_lift_2);
 
 
 			state=Order_distribution;
@@ -220,7 +220,7 @@ void controller(void)
 				}
 				//in queue schreiben
 			}
-			if(Jobs_inprogress_lift_2[0][0]!=0)
+			if(Jobs_inprogress_lift_2[0].Floor!=-1)
 			{
 				i=0;
 				while(Jobs_inprogress_lift_1[i].Floor!=-1)
@@ -288,7 +288,7 @@ void controller(void)
 		if(checkValidOrder(newOrder)){
 			Pending_orders[order]=newOrder;
 			order++;
-			currentId
+			currentId++;
 		}
 	}
 
@@ -296,15 +296,15 @@ void controller(void)
 
 }
 
-char Find_direction (char p[][2],char last_position)
+char Find_direction (Order p[],char last_position)
 {
-	if(last_position==p[0][0])
+	if(last_position==p[0].Floor)
 	{
 		return Stay;
-	}else if(last_position>p[0][0])
+	}else if(last_position>p[0].Floor)
 	{
 		return Down;
-	}else if(last_position<p[0][0])
+	}else if(last_position<p[0].Floor)
 	{
 		return Up;
 	}else
