@@ -27,8 +27,7 @@
 #define Inform				0
 #define Order_distribution	1
 #define Inquiry				2
-#define Wait				3
-#define New_information		4
+
 
 #define Max 				20
 
@@ -54,8 +53,8 @@ char Jobs_inprogress_lift_2 [Max][4];
 char possible_floors_lift_1[2];
 char possible_floors_lift_2[2];
 
-char last_position_lift_1;
-char last_position_lift_2;
+char last_position_lift_1=1;
+char last_position_lift_2=1;
 char direction_lift_1;
 char direction_lift_2;
 char order;
@@ -74,7 +73,7 @@ Job recJob = {0,0,0};
 /*----- Function prototypes ------------------------------------------------*/
 
 
-char Find_direction (char p[][2],char last_position);
+char Find_direction (char p[][4],char last_position);
 char Array_arrange_4 (char p[][4]);
 
 
@@ -88,8 +87,8 @@ void controller(void)
 	{
 		case Inform:
 
-			direction_lift_1=Find_direction(Jobs_inprogress_lift_1[0][0],last_position_lift_1);
-			direction_lift_2=Find_direction(Jobs_inprogress_lift_2[0][0],last_position_lift_2);
+			direction_lift_1=Find_direction(Jobs_inprogress_lift_1,last_position_lift_1);
+			direction_lift_2=Find_direction(Jobs_inprogress_lift_2,last_position_lift_2);
 
 
 			state=Order_distribution;
@@ -115,7 +114,7 @@ void controller(void)
 				}
 				switch (Lift_12)
 				{
-						case Lift1:
+					case Lift1:
 						if(direction_lift_1==Stay)
 						{
 							//Direkte aufgaben verteilung
@@ -297,7 +296,29 @@ void controller(void)
 	}
 	while(xQeueReceive(_liftBToController,&recJob, TIME)!=0)
 	{
-
+		do
+		{
+			if(recJob.id==Jobs_inprogress_lift_2[i][ID])
+			{
+				if(recJob.success==0)
+				{
+					Pending_orders[order][Floor]=Jobs_inprogress_lift_2[i][Floor];
+					Pending_orders[order][Direction]=Jobs_inprogress_lift_2[i][Direction];
+					Pending_orders[order][Lift]=Jobs_inprogress_lift_2[i][Lift];
+					Pending_orders[order][ID]=Jobs_inprogress_lift_2[i][ID];
+					order++;
+				}else if(recJob.success==1)
+				{
+					Jobs_inprogress_lift_2[i][Floor]=0;			//Auftrag lï¿½schen
+					Jobs_inprogress_lift_2[i][Direction]=0;
+					Jobs_inprogress_lift_2[i][Lift]=0;
+					Jobs_inprogress_lift_2[i][ID]=0;
+					inprogress_lift_1=Array_arrange_4(Jobs_inprogress_lift_2);
+//////////////////////////////////////////Licht löschen
+				}
+			}
+			i++;
+		}while(recJob.id!=Jobs_inprogress_lift_2[i][ID]);
 	}
 
 	/*
@@ -314,7 +335,7 @@ void controller(void)
 
 }
 
-char Find_direction (char p[][2],char last_position)
+char Find_direction (char p[][4],char last_position)
 {
 	if(last_position==p[0][0])
 	{
