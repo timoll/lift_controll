@@ -100,7 +100,7 @@ void openDoor(int address)//Choose which floor
 		msg.data[i] = 0x00;
 	}
 	msg.data[4]=0x5;//open & fast
-	xQueueSend(_ToCan,&msg,queueTime);
+	xQueueSend(_toCan,&msg,queueTime);
 }
 void closeDoor(int address)//Choose which floor
 {
@@ -119,7 +119,7 @@ void closeDoor(int address)//Choose which floor
 		msg.data[i] = 0x00;
 	}
 	msg.data[4]=0x02;// close & slow
-	xQueueSend(_liftToCan,&msg,queueTime);
+	xQueueSend(_toCan,&msg,queueTime);
 }
 void stoppDoor(int address)//Choose which floor
 {
@@ -137,7 +137,7 @@ void stoppDoor(int address)//Choose which floor
 	{
 		msg.data[i] = 0x00;// stopp Door
 	}
-	xQueueSend(_ToCan,&msg,queueTime);
+	xQueueSend(_toCan,&msg,queueTime);
 }
 
 //functions to controll the motors
@@ -157,7 +157,7 @@ void reachedDestination(int address)//Choose which motor
 	{
 		msg.data[i] = 0x00;//stop the motor!!
 	}
-	xQueueSend(_ToCan,&msg,queueTime);
+	xQueueSend(_toCan,&msg,queueTime);
 }
 void allmostReachedUp(int address)//Choose which motor
 {
@@ -176,7 +176,7 @@ void allmostReachedUp(int address)//Choose which motor
 			msg.data[i] = 0x00;
 		}
 		msg.data[2]=0x02;//up & slow
-		xQueueSend(_ToCan,&msg,queueTime);
+		xQueueSend(_toCan,&msg,queueTime);
 }
 void allmostReachedDown(int address)//Choose which motor
 {
@@ -195,7 +195,7 @@ void allmostReachedDown(int address)//Choose which motor
 			msg.data[i] = 0x00;
 		}
 		msg.data[2]=0x05;//down & slow
-		xQueueSend(_ToCan,&msg,queueTime);
+		xQueueSend(_toCan,&msg,queueTime);
 }
 void moveUp(int address)//Choose which motor
 {
@@ -214,7 +214,7 @@ void moveUp(int address)//Choose which motor
 		msg.data[i] = 0x00;
 	}
 	msg.data[2]=0x04;//up & fast
-	xQueueSend(_ToCan,&msg,queueTime);
+	xQueueSend(_toCan,&msg,queueTime);
 }
 void moveDown(int address)//Choose which motor
 {
@@ -233,7 +233,7 @@ void moveDown(int address)//Choose which motor
 		msg.data[i] = 0x00;
 	}
 	msg.data[3]=0x05;//down & fast
-	xQueueSend(_ToCan,&msg,queueTime);
+	xQueueSend(_toCan,&msg,queueTime);
 }
 
 //functions to manage jobs

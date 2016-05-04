@@ -35,15 +35,16 @@
 #include <memPoolService.h>			/* Memory pool manager service			*/
 #include "task_communication.h"
 #include "lift.h"
+#include "can_controll.h"
 
 /*----- Macros -------------------------------------------------------------*/
 
 /*----- Data types ---------------------------------------------------------*/
 
 /*----- Function prototypes ------------------------------------------------*/
-void sendCanMessage    (void *);
-void writeCanMessage   (void *);
-void readCanMessageIRQ (void);
+//void sendCanMessage    (void *);
+//void writeCanMessage   (void *);
+//void readCanMessageIRQ (void);
 
 /*----- Data ---------------------------------------------------------------*/
 xSemaphoreHandle Muxtex_Can_Tx;
@@ -85,7 +86,7 @@ int main(void)
 
 	/* create tasks */
 	xTaskCreate(sendCanMessage,  (const signed char * const)"Send Can Message",  1024, NULL, 4, NULL);
-	xTaskCreate(writeCanMessage, (const signed char * const)"Write Can Message", 1024, NULL, 4, NULL);
+	//xTaskCreate(writeCanMessage, (const signed char * const)"Write Can Message", 1024, NULL, 4, NULL);
 	xTaskCreate(lift,(const signed char * const)"Lift", 1024, NULL, 4, NULL);
 
 	vTaskStartScheduler();

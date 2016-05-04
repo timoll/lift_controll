@@ -13,5 +13,6 @@
 #include "com.h"
 #include <can.h>
 
-
+void readCanMessageIRQ ();
+void sendCanMessage();
 #endif /* CAN_CONTROLL_H_ */
