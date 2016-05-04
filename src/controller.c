@@ -57,7 +57,7 @@ Order Pending_orders [Max];
 Order Jobs_inprogress_lift_1 [Max];
 Order Jobs_inprogress_lift_2 [Max];
 const Order noOrder={-1,-1,-1,-1};
-int currentId=0;
+char currentId=0;
 char possible_floors_lift_1[2];
 char possible_floors_lift_2[2];
 
