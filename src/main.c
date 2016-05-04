@@ -34,12 +34,11 @@
 #include <semphr.h>					/* FreeRTOS semaphores					*/
 #include <memPoolService.h>			/* Memory pool manager service			*/
 #include "task_communication.h"
-<<<<<<< .merge_file_a11148
+
 #include "lift.h"
 #include "can_controll.h"
-=======
+
 #include "controller.h"
->>>>>>> .merge_file_a43284
 
 /*----- Macros -------------------------------------------------------------*/
 
@@ -88,15 +87,15 @@ int main(void)
 	CARME_CAN_SetMode(CARME_CAN_DF_NORMAL);
 
 
+
 	/* create tasks */
 	xTaskCreate(sendCanMessage,  (const signed char * const)"Send Can Message",  1024, NULL, 4, NULL);
-<<<<<<< .merge_file_a11148
+
 	//xTaskCreate(writeCanMessage, (const signed char * const)"Write Can Message", 1024, NULL, 4, NULL);
 	xTaskCreate(lift,(const signed char * const)"Lift", 1024, NULL, 4, NULL);
-=======
-	xTaskCreate(writeCanMessage, (const signed char * const)"Write Can Message", 1024, NULL, 4, NULL);
+
 	xTaskCreate(controller,  (const signed char * const)"controller",  1024, NULL, 4, NULL);
->>>>>>> .merge_file_a43284
+	initQueues();
 
 	vTaskStartScheduler();
 

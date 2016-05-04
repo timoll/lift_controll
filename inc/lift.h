@@ -52,6 +52,9 @@ CARME_CAN_MESSAGE msg;
  void getInformation(void);
 
 extern void lift(void *pvargs);
+extern int initLiftA(void);
+extern int initLiftB(void);
+
 
 
 #endif /* LIFT_H_ */

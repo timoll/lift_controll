@@ -44,46 +44,47 @@ void getInformation(void)
 {
 	CARME_CAN_MESSAGE receivedMessage;
 	//Set Endschalter!!!
-	xQueueReceive(_canToLift,&receivedMessage, queueTime); //write the contant into receivedMessage
-	liftName = receivedMessage.id %2; //find out which elevator is meant
-	switch (liftName)
-	{
-		case 0: //Lift A
-			endschalterA = receivedMessage.data[0];
-			break;
-		case 1:	//Lift B
-			endschalterB = receivedMessage.data[0];
-			break;
-	}
-	//Set LEVEL!!!
-	
-	/* Level 1 =>1
-	 * Level 2 =>2
-	 * Level 3 =>3
-	 * Level 4 =>4
-	 * Level 5 =>5
-	 * Level 6 =>6
-	 * same for levelAalmost*/
-	//set LevelA
-	if(((endschalterA & 0x01)) &&(receivedMessage.id%2==0))//reached floor and ID is For Elevator A
-	{
-		levelA=receivedMessage.id/2;
-	}
+	if(xQueueReceive(_canToLift, &receivedMessage, queueTime)){//write the contant into receivedMessage
+		liftName = receivedMessage.id %2; //find out which elevator is meant
+		switch (liftName)
+		{
+			case 0: //Lift A
+				endschalterA = receivedMessage.data[0];
+				break;
+			case 1:	//Lift B
+				endschalterB = receivedMessage.data[0];
+				break;
+		}
+		//Set LEVEL!!!
 
-	if(((endschalterA & 0x02)) &&(receivedMessage.id%2==0))//close to floor and ID is for ElevatorA
-	{
-		almost_A=receivedMessage.id/2;
-	}
-	//set LevelB
-	
-	if(((endschalterB & 0x01)) && (receivedMessage.id%2!=0))//reached floor and ID is not for Elevator A
-	{
-		levelB=(receivedMessage.id-1)/2;
-	}
+		/* Level 1 =>1
+		 * Level 2 =>2
+		 * Level 3 =>3
+		 * Level 4 =>4
+		 * Level 5 =>5
+		 * Level 6 =>6
+		 * same for levelAalmost*/
+		//set LevelA
+		if(((endschalterA & 0x01)) &&(receivedMessage.id%2==0))//reached floor and ID is For Elevator A
+		{
+			levelA=receivedMessage.id/2;
+		}
 
-	if(((endschalterB & 0x02)) && (receivedMessage.id%2!=0))//close to floor and ID is not for Elevator A
-	{
-		almost_B=(receivedMessage.id-1)/2;
+		if(((endschalterA & 0x02)) &&(receivedMessage.id%2==0))//close to floor and ID is for ElevatorA
+		{
+			almost_A=receivedMessage.id/2;
+		}
+		//set LevelB
+
+		if(((endschalterB & 0x01)) && (receivedMessage.id%2!=0))//reached floor and ID is not for Elevator A
+{
+			levelB=(receivedMessage.id-1)/2;
+		}
+
+		if(((endschalterB & 0x02)) && (receivedMessage.id%2!=0))//close to floor and ID is not for Elevator A
+		{
+			almost_B=(receivedMessage.id-1)/2;
+		}
 	}
 }
 
@@ -94,17 +95,9 @@ void openDoor(int address)//Choose which floor
 	 * as address put stock1A, stock1B....
 	 */
 
-	CARME_CAN_MESSAGE msg;
+	CARME_CAN_MESSAGE msg=_zeroCanMessage;
 	msg.id  = address;
-	msg.ext = 0;
-	msg.rtr = 0;
-	msg.dlc = messageLength;
-	int i;
-	for (i = 0; i < 8; i++)
-	{
-		msg.data[i] = 0x00;
-	}
-	msg.data[4]=0x5;//open & fast
+	msg.data[2]=0x5;//open & fast
 	xQueueSend(_toCan,&msg,queueTime);
 }
 void closeDoor(int address)//Choose which floor
@@ -113,17 +106,9 @@ void closeDoor(int address)//Choose which floor
 	 * as address put stock1A, stock1B....
 	 */
 
-	CARME_CAN_MESSAGE msg;
-	msg.id  = address;
-	msg.ext = 0;
-	msg.rtr = 0;
-	msg.dlc = messageLength;
-	int i;
-	for (i = 0; i < 8; i++)
-	{
-		msg.data[i] = 0x00;
-	}
-	msg.data[4]=0x02;// close & slow
+	CARME_CAN_MESSAGE msg=_zeroCanMessage;
+	msg.id=address;
+	msg.data[2]=0x02;// close & slow
 	xQueueSend(_toCan,&msg,queueTime);
 }
 void stoppDoor(int address)//Choose which floor
@@ -132,16 +117,8 @@ void stoppDoor(int address)//Choose which floor
 	 * as address put stock1A, stock1B....
 	 */
 
-	CARME_CAN_MESSAGE msg;
-	msg.id  = address;
-	msg.ext = 0;
-	msg.rtr = 0;
-	msg.dlc = messageLength;
-	int i;
-	for (i = 0; i < 8; i++)
-	{
-		msg.data[i] = 0x00;// stopp Door
-	}
+	CARME_CAN_MESSAGE msg=_zeroCanMessage;
+	msg.id=address;
 	xQueueSend(_toCan,&msg,queueTime);
 }
 
@@ -152,16 +129,8 @@ void reachedDestination(int address)//Choose which motor
 	 * as address put stock1A, stock1B....
 	 */
 
-	CARME_CAN_MESSAGE msg;
+	CARME_CAN_MESSAGE msg=_zeroCanMessage;
 	msg.id  = address;
-	msg.ext = 0;
-	msg.rtr = 0;
-	msg.dlc = messageLength;
-	int i;
-	for (i = 0; i < 8; i++)
-	{
-		msg.data[i] = 0x00;//stop the motor!!
-	}
 	xQueueSend(_toCan,&msg,queueTime);
 }
 void allmostReachedUp(int address)//Choose which motor
@@ -170,18 +139,10 @@ void allmostReachedUp(int address)//Choose which motor
 	 * as address put motorA or motorB
 	 */
 
-	CARME_CAN_MESSAGE msg;
-		msg.id  = address;
-		msg.ext = 0;
-		msg.rtr = 0;
-		msg.dlc = messageLength;
-		int i;
-		for (i = 0; i < 8; i++)
-		{
-			msg.data[i] = 0x00;
-		}
-		msg.data[2]=0x02;//up & slow
-		xQueueSend(_toCan,&msg,queueTime);
+	CARME_CAN_MESSAGE msg=_zeroCanMessage;
+	msg.id  = address;
+	msg.data[2]=0x02;//up & slow
+	xQueueSend(_toCan,&msg,queueTime);
 }
 void allmostReachedDown(int address)//Choose which motor
 {
@@ -189,16 +150,8 @@ void allmostReachedDown(int address)//Choose which motor
 	 * as address put motorA or motorB
 	 */
 
-	CARME_CAN_MESSAGE msg;
+	CARME_CAN_MESSAGE msg=_zeroCanMessage;
 		msg.id  = address;
-		msg.ext = 0;
-		msg.rtr = 0;
-		msg.dlc = messageLength;
-		int i;
-		for (i = 0; i < 8; i++)
-		{
-			msg.data[i] = 0x00;
-		}
 		msg.data[2]=0x05;//down & slow
 		xQueueSend(_toCan,&msg,queueTime);
 }
@@ -208,16 +161,8 @@ void moveUp(int address)//Choose which motor
 	 * as address put motorA or motorB
 	 */
 
-	CARME_CAN_MESSAGE msg;
-	msg.id  = address;
-	msg.ext = 0;
-	msg.rtr = 0;
-	msg.dlc = messageLength;
-	int i;
-	for (i = 0; i < 8; i++)
-	{
-		msg.data[i] = 0x00;
-	}
+	CARME_CAN_MESSAGE msg=_zeroCanMessage;
+		msg.id  = address;
 	msg.data[2]=0x04;//up & fast
 	xQueueSend(_toCan,&msg,queueTime);
 }
@@ -227,17 +172,9 @@ void moveDown(int address)//Choose which motor
 	 * as address put motorA or motorB
 	 */
 
-	CARME_CAN_MESSAGE msg;
+	CARME_CAN_MESSAGE msg = _zeroCanMessage;
 	msg.id  = address;
-	msg.ext = 0;
-	msg.rtr = 0;
-	msg.dlc = messageLength;
-	int i;
-	for (i = 0; i < 8; i++)
-	{
-		msg.data[i] = 0x00;
-	}
-	msg.data[3]=0x05;//down & fast
+	msg.data[2]=0x05;//down & fast
 	xQueueSend(_toCan,&msg,queueTime);
 }
 
@@ -285,7 +222,7 @@ int initLiftA(void)
 	{
 		getInformation();
 
-		if((levelA==1)&&(endschalterA == 0x01))
+		if((levelA==1)&&(endschalterA & 0x01))
 		{
 			reachedDestination(motorA);//turn off motorA
 			finished=1;
@@ -304,7 +241,7 @@ int initLiftB(void)
 	{
 		getInformation();
 
-		if((levelB==1)&&(endschalterB == 0x01))
+		if((levelB==1)&&(endschalterB & 0x01))
 		{
 			reachedDestination(motorB);//turn off motorB
 			finished=1;
@@ -329,7 +266,7 @@ void lift(void *pvargs)
 	for(;;){
 		getInformation();
 		sprintf(liftString, "endA:%x, endB:%x levelA:%d  LevelB:%d", endschalterA, endschalterB, levelA, levelB);
-		LCD_DisplayStringXY(posLiftx, posLifty,liftstring);
+		LCD_DisplayStringXY(posLiftx, posLifty,liftString);
 
 
 		//Procedure
@@ -375,7 +312,7 @@ void lift(void *pvargs)
 				}
 			}
 			sprintf(liftString, "DirectionA:%d", directionA);
-			LCD_DisplayStringXY(posLiftx, posLifty,liftstring);
+			LCD_DisplayStringXY(posLiftx, posLifty,liftString);
 		 }
 
 #ifndef LIFT_B
@@ -416,21 +353,21 @@ void lift(void *pvargs)
 				}
 			}
 			sprintf(liftString, "DirectionA:%d, DirectionB:%d", directionA, directionB);
-			LCD_DisplayStringXY(posLiftx, posLifty,liftstring);
+			LCD_DisplayStringXY(posLiftx, posLifty,liftString);
 		 }
 #endif //LIFT_B
 
 		 //2a)-------------------------------------------------------------------------------------------------------------------------
-		if((endschalterA == 0x02) && (StoppLevelA[almost_A-1] == 1) && (directionA == UP)){//almost reached and near-switch pressed
+		if((endschalterA & 0x02) && (StoppLevelA[almost_A-1] == 1) && (directionA == UP)){//almost reached and near-switch pressed
 			allmostReachedUp(motorA);
 		}
 
-		if((endschalterA == 0x02) && (StoppLevelA[almost_A-1] == 1) && (directionA == DOWN)){//almost reached and near-switch pressed
+		if((endschalterA & 0x02) && (StoppLevelA[almost_A-1] == 1) && (directionA == DOWN)){//almost reached and near-switch pressed
 			allmostReachedDown(motorA);
 		}
 #ifndef LIFT_B
 		 //2b)-------------------------------------------------------------------------------------------------------------------------
-		if((endschalterB == 0x02) && (StoppLevelB[almost_B-1] == 1) && (directionB == UP)){//almost reached and near-switch pressed
+		if((endschalterB & 0x02) && (StoppLevelB[almost_B-1] == 1) && (directionB == UP)){//almost reached and near-switch pressed
 			allmostReachedUp(motorB);
 		}
 
@@ -440,26 +377,27 @@ void lift(void *pvargs)
 #endif //LIFT_B
 
 		//3a)-------------------------------------------------------------------------------------------------------------------------
-		if((endschalterA == 0x01) && (StoppLevelA[levelA-1] == 1)){// reached and StoppLevelA Bit is (set LevelA-1) is necessary because the first level is 1, but I need an Index of 0
+		if((endschalterA & 0x01) && (StoppLevelA[levelA-1] == 1)){// reached and StoppLevelA Bit is (set LevelA-1) is necessary because the first level is 1, but I need an Index of 0
 			reachedDestination(motorA);//Stops the motor
 			openDoor(levelA*2);//(levelA*2) is necessary to translate for example LevelA=1 to the define stock1A=0x02 which is the address for the Can-Message
-			if((endschalterA & 0x08)){//door open
-				stoppDoor(levelA*2);
-			}
-			closeDoor(levelA*2);
-			if((endschalterA & 0x04) ){//door closed
-				stoppDoor(levelA*2);
-			}
 
+			while(!(endschalterA & 0x08)){//door open
+				getInformation();
+			}
+			stoppDoor(levelA*2);
+			StoppLevelA[levelA-1]=0; //erase the Bit because the Job is done
+			closeDoor(levelA*2);
+			while(!(endschalterA & 0x04) ){//door closed
+				getInformation();
+			}
+			stoppDoor(levelA*2);
 			//Check if there are still some jobs I need to do
 			if(directionA==UP){
 				int i;
+				AstillMoveUP=0;
 				for(i=levelA;i<5;i++){
 					if(StoppLevelA[i]==1){
 						AstillMoveUP=1;
-					}
-					else{
-						AstillMoveUP=0;
 					}
 				}
 				if(AstillMoveUP==1){
@@ -474,93 +412,74 @@ void lift(void *pvargs)
 				}
 			}
 			if(directionA==DOWN){
-				int i;
-				for(i=levelA;i!=0;i--){
-					if(StoppLevelA[i]==1){
-						AstillMoveDOWN=1;
-					}
-					else{
-						AstillMoveDOWN=0;
-					}
-				}
-				if(AstillMoveDOWN==1){
-					directionA=DOWN;//set Direction
-					moveDown(motorA);//move elavator
-					LCD_DisplayStringXY(posLiftx, posLifty,"                                   ");//erase all characters left
-					LCD_DisplayStringXY(posLiftx, posLifty,"still move down");
-				}
-				if(AstillMoveDOWN==0){
-					directionA=STILL;
-					LCD_DisplayStringXY(posLiftx, posLifty,"still             ");
-				}
-			}
+							int i;
+							AstillMoveDOWN=0;
+							for(i=0;i<levelA;i++){
+								if(StoppLevelA[i]==1){
+									AstillMoveDOWN=1;
+								}
+							}
+							if(AstillMoveDOWN==1){
+								directionA=DOWN;//set Direction
+								moveDown(motorA);//move elavator
+								LCD_DisplayStringXY(posLiftx, posLifty,"                                   ");//erase all characters left
+								LCD_DisplayStringXY(posLiftx, posLifty,"A still move up ");
+							}
+							if(AstillMoveDOWN==0){
+								directionA=STILL;
+								LCD_DisplayStringXY(posLiftx, posLifty,"still           ");
+							}
+						}
 			//Job is done
-			StoppLevelA[levelA-1]=0; //erase the Bit because the Job is done
+
 			sendJobA(levelA-1);//Inform of the finished Jobs
 			LCD_DisplayStringXY(posLiftx, posLifty,"A reached destination");
 		}
 #ifndef LIFT_B
 		//3b)-------------------------------------------------------------------------------------------------------------------------
-		if((endschalterB == 0x01) && (StoppLevelB[levelB-1] == 1)){// reached destination
-			reachedDestination(motorB);//Stops the motor
-			openDoor((levelB*2)+1);//(levelB*2)+1 is necessary to translat for example LevelB=1 to the define stock1B=0x03 which is the address for the Can-Message
-			if((endschalterB & 0x08)== 1){//door open
-				stoppDoor((levelB*2)+1);
-			}
-			closeDoor((levelB*2)+1);
-			if((endschalterB & 0x04)== 1 ){//door closed
-				stoppDoor((levelB*2)+1);
-			}
-
-			//Check if there are still some jobs I need to do
-			if(directionB==UP){
-				int i;
-				for(i=levelB;i<5;i++){
-					if(StoppLevelB[i]==1){
-						BstillMoveUP=1;
-					}
-					else{
-						BstillMoveUP=0;
-					}
-				}
-				if(BstillMoveUP==1){
-					directionB=UP;//set Direction
-					moveUp(motorB);//move elavator
-					LCD_DisplayStringXY(posLiftx, posLifty,"                                   ");//erase all characters left
-					LCD_DisplayStringXY(posLiftx, posLifty,"B still move up ");
-				}
-				if(BstillMoveUP==0){
-					directionB=STILL;
-					LCD_DisplayStringXY(posLiftx, posLifty,"still           ");
+		if(directionB==UP){
+			int i;
+			BstillMoveUP=0;
+			for(i=levelB;i<5;i++){
+				if(StoppLevelB[i]==1){
+					BstillMoveUP=1;
 				}
 			}
-			if(directionB==DOWN){
-				int i;
-				for(i=levelB;i!=0;i--){
-					if(StoppLevelB[i]==1)
-					{
-						BstillMoveDOWN=1;
-					}
-					else{
-						BstillMoveDOWN=0;
-					}
-				}
-				if(BstillMoveDOWN==1){
-					directionB=DOWN;//set Direction
-					moveDown(motorB);//move elavator
-					LCD_DisplayStringXY(posLiftx, posLifty,"                                   ");//erase all characters left
-					LCD_DisplayStringXY(posLiftx, posLifty,"B still move down ");
-				}
-				if(BstillMoveDOWN==0){
-					directionB=STILL;
-					LCD_DisplayStringXY(posLiftx, posLifty,"still           ");
-				}
+			if(BstillMoveUP==1){
+				directionB=UP;//set Direction
+				moveUp(motorB);//move elavator
+				LCD_DisplayStringXY(posLiftx, posLifty,"                                   ");//erase all characters left
+				LCD_DisplayStringXY(posLiftx, posLifty,"A still move up ");
 			}
-			//Job is done
-			StoppLevelB[levelB-1]=0; //erase the Bit because the Job is done
-			sendJobB(levelB-1);
-			LCD_DisplayStringXY(posLiftx, posLifty,"B reached destination");
+			if(BstillMoveUP==0){
+				directionB=STILL;
+				LCD_DisplayStringXY(posLiftx, posLifty,"still           ");
+			}
 		}
+		if(directionB==DOWN){
+			int i;
+			BstillMoveDOWN=0;
+			for(i=0;i<levelB;i++){
+				if(StoppLevelB[i]==1){
+					BstillMoveDOWN=1;
+				}
+			}
+			if(BstillMoveDOWN==1){
+				directionB=DOWN;//set Direction
+				moveDown(motorB);//move elavator
+				LCD_DisplayStringXY(posLiftx, posLifty,"                                   ");//erase all characters left
+				LCD_DisplayStringXY(posLiftx, posLifty,"A still move up ");
+			}
+			if(BstillMoveDOWN==0){
+				directionB=STILL;
+				LCD_DisplayStringXY(posLiftx, posLifty,"still           ");
+			}
+		}
+		//Job is done
+
+		sendJobB(levelB-1);//Inform of the finished Jobs
+		LCD_DisplayStringXY(posLiftx, posLifty,"A reached destination");
+	}
 #endif //LIFT_B
 		vTaskDelay(35);
 	}
