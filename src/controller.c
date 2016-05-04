@@ -33,24 +33,31 @@
 #define Max 				20
 
 
-#define Up					1
-#define Down				2
-#define Stay				0
+#define Up					0
+#define Down				1
+#define Stay				2
 
-#define Floor				0
-#define Direction			1
-#define Lift				2
-#define ID					3
+//#define Floor				0
+//#define Direction			1
+//#define Lift				2
+//#define ID					3
 
-#define Lift1				1
-#define Lift2				2
-#define Outside				0
-#define TIME				1000
+#define TIME				10
 /*----- Data ---------------------------------------------------------------*/
-char Pending_orders [Max][4];
-char Jobs_inprogress_lift_1 [Max][4];
-char Jobs_inprogress_lift_2 [Max][4];
 
+typedef enum _lift { Lift1, Lift2, Outside  } TaskSource;
+typedef struct _orders{
+	int Floor=-1;
+	int Direction=-1;
+	int Lift =-1;
+	int Id=-1;
+}Order;
+
+Order Pending_orders [Max];
+Order Jobs_inprogress_lift_1 [Max];
+Order Jobs_inprogress_lift_2 [Max];
+const Order noOrder;
+int currentId=0;
 char possible_floors_lift_1[2];
 char possible_floors_lift_2[2];
 
@@ -75,7 +82,8 @@ Job recJob = {0,0,0};
 
 
 char Find_direction (char p[][2],char last_position);
-char Array_arrange_4 (char p[][4]);
+char Array_arrange_4 (Order p[]);
+int checkValidOrder(Order order);
 
 
 
@@ -101,10 +109,10 @@ void controller(void)
 			for(i=0;i<order;i++)
 			{
 				char Lift_12;
-				Lift_12=Pending_orders[i][Lift];
+				Lift_12=Pending_orders[i].Lift;
 				if(Lift_12==Outside)
 				{
-					if(abs(last_position_lift_1-Pending_orders[i][Floor])>abs(last_position_lift_2-Pending_orders[i][Floor]))
+					if(abs(last_position_lift_1-Pending_orders[i].Floor)>abs(last_position_lift_2-Pending_orders[i].Floor))
 					{
 						Lift_12=Lift2;
 					}
@@ -119,53 +127,36 @@ void controller(void)
 						if(direction_lift_1==Stay)
 						{
 							//Direkte aufgaben verteilung
-							if(last_position_lift_1>Pending_orders[i][Floor])
+							if(last_position_lift_1>Pending_orders[i].Floor)
 							{
 								direction_lift_1=Down;
-							}else if(last_position_lift_1<Pending_orders[i][Floor])
+							}else if(last_position_lift_1<Pending_orders[i].Floor)
 							{
 								direction_lift_1=Up;
 							}else
 							{
 								direction_lift_1=Stay;
 							}
-							Jobs_inprogress_lift_1[inprogress_lift_1+i][Floor]=Pending_orders[i][Floor];
-							Jobs_inprogress_lift_1[inprogress_lift_1+i][Direction]=Pending_orders[i][Direction];
-							Jobs_inprogress_lift_1[inprogress_lift_1+i][Lift]=Pending_orders[i][Lift];
-							Jobs_inprogress_lift_1[inprogress_lift_1+i][ID]=Pending_orders[i][ID];
+							Jobs_inprogress_lift_1[inprogress_lift_1+i]=Pending_orders[i];
 
-							Pending_orders[i][0]=0;			//Auftrag lï¿½schen
-							Pending_orders[i][1]=0;
-							Pending_orders[i][2]=0;
-							Pending_orders[i][3]=0;
+							Pending_orders[i]=noOrder;
 
 						}else if(direction_lift_1==Up)
 						{
-							if(last_position_lift_1<=Pending_orders[i][Floor])
+							if(last_position_lift_1<=Pending_orders[i].Floor)
 							{
-								Jobs_inprogress_lift_1[inprogress_lift_1+i][Floor]=Pending_orders[i][Floor];
-								Jobs_inprogress_lift_1[inprogress_lift_1+i][Direction]=Pending_orders[i][Direction];
-								Jobs_inprogress_lift_1[inprogress_lift_1+i][Lift]=Pending_orders[i][Lift];
-								Jobs_inprogress_lift_1[inprogress_lift_1+i][ID]=Pending_orders[i][ID];
+								Jobs_inprogress_lift_1[inprogress_lift_1+i]=Pending_orders[i];
 
-								Pending_orders[i][0]=0;			//Auftrag lï¿½schen
-								Pending_orders[i][1]=0;
-								Pending_orders[i][2]=0;
-								Pending_orders[i][3]=0;
+
+								Pending_orders[i]=noOrder;
 							}
 						}else if(direction_lift_1==Down)
 						{
-							if(last_position_lift_1>=Pending_orders[i][Floor])
+							if(last_position_lift_1>=Pending_orders[i].Floor)
 							{
-								Jobs_inprogress_lift_1[inprogress_lift_1+i][Floor]=Pending_orders[i][Floor];
-								Jobs_inprogress_lift_1[inprogress_lift_1+i][Direction]=Pending_orders[i][Direction];
-								Jobs_inprogress_lift_1[inprogress_lift_1+i][Lift]=Pending_orders[i][Lift];
-								Jobs_inprogress_lift_1[inprogress_lift_1+i][ID]=Pending_orders[i][ID];
+								Jobs_inprogress_lift_1[inprogress_lift_1+i]=Pending_orders[i];
 
-								Pending_orders[i][0]=0;			//Auftrag lï¿½schen
-								Pending_orders[i][1]=0;
-								Pending_orders[i][2]=0;
-								Pending_orders[i][3]=0;
+								Pending_orders[i]=noOrder;
 							}
 						}
 						break;
@@ -174,53 +165,35 @@ void controller(void)
 						if(direction_lift_2==Stay)
 						{
 							//Direkte aufgaben verteilung
-							if(last_position_lift_2>Pending_orders[i][Floor])
+							if(last_position_lift_2>Pending_orders[i].Floor)
 							{
 								direction_lift_2=Down;
-							}else if(last_position_lift_2<Pending_orders[i][Floor])
+							}else if(last_position_lift_2<Pending_orders[i].Floor)
 							{
 								direction_lift_2=Up;
 							}else
 							{
 								direction_lift_2=Stay;
 							}
-							Jobs_inprogress_lift_2[inprogress_lift_2+i][Floor]=Pending_orders[i][Floor];
-							Jobs_inprogress_lift_2[inprogress_lift_2+i][Direction]=Pending_orders[i][Direction];
-							Jobs_inprogress_lift_2[inprogress_lift_2+i][Lift]=Pending_orders[i][Lift];
-							Jobs_inprogress_lift_2[inprogress_lift_2+i][ID]=Pending_orders[i][ID];
+							Jobs_inprogress_lift_2[inprogress_lift_2+i]=Pending_orders[i];
 
-							Pending_orders[i][0]=0;			//Auftrag lï¿½schen
-							Pending_orders[i][1]=0;
-							Pending_orders[i][2]=0;
-							Pending_orders[i][3]=0;
+							Pending_orders[i]=noOrder;
 
 						}else if(direction_lift_2==Up)
 						{
-							if(last_position_lift_2<=Pending_orders[i][Floor])
+							if(last_position_lift_2<=Pending_orders[i].Floor)
 							{
-								Jobs_inprogress_lift_2[inprogress_lift_2+i][Floor]=Pending_orders[i][Floor];
-								Jobs_inprogress_lift_2[inprogress_lift_2+i][Direction]=Pending_orders[i][Direction];
-								Jobs_inprogress_lift_2[inprogress_lift_2+i][Lift]=Pending_orders[i][Lift];
-								Jobs_inprogress_lift_2[inprogress_lift_2+i][ID]=Pending_orders[i][ID];
+								Jobs_inprogress_lift_2[inprogress_lift_2+i]=Pending_orders[i];
 
-								Pending_orders[i][0]=0;			//Auftrag lï¿½schen
-								Pending_orders[i][1]=0;
-								Pending_orders[i][2]=0;
-								Pending_orders[i][3]=0;
+								Pending_orders[i]=noOrder;
 							}
 						}else if(direction_lift_2==Down)
 						{
-							if(last_position_lift_2>=Pending_orders[i][Floor])
+							if(last_position_lift_2>=Pending_orders[i].Floor)
 							{
-								Jobs_inprogress_lift_2[inprogress_lift_2+i][Floor]=Pending_orders[i][Floor];
-								Jobs_inprogress_lift_2[inprogress_lift_2+i][Direction]=Pending_orders[i][Direction];
-								Jobs_inprogress_lift_2[inprogress_lift_2+i][Lift]=Pending_orders[i][Lift];
-								Jobs_inprogress_lift_2[inprogress_lift_2+i][ID]=Pending_orders[i][ID];
+								Jobs_inprogress_lift_2[inprogress_lift_2+i]=Pending_orders[i];
 
-								Pending_orders[i][0]=0;			//Auftrag lï¿½schen
-								Pending_orders[i][1]=0;
-								Pending_orders[i][2]=0;
-								Pending_orders[i][3]=0;
+								Pending_orders[i]=noOrder;
 							}
 						}
 						break;
@@ -232,13 +205,13 @@ void controller(void)
 			break;
 
 		case Inquiry:
-			if(Jobs_inprogress_lift_1[0][0]!=0)
+			if(Jobs_inprogress_lift_1[0].Floor!=-1)
 			{
 				i=0;
-				while(Jobs_inprogress_lift_1[i][0]!=0)
+				while(Jobs_inprogress_lift_1[i].Floor!=-1)
 				{
-					sendJob.id=Jobs_inprogress_lift_1[i][ID];
-					sendJob.targetFloor=Jobs_inprogress_lift_1[i][Floor];
+					sendJob.id=Jobs_inprogress_lift_1[i].Id;
+					sendJob.targetFloor=Jobs_inprogress_lift_1[i].Floor;
 					sendJob.success=0;
 
 					xQueueSend(_controllerToLiftA, &sendJob, 0);
@@ -250,10 +223,10 @@ void controller(void)
 			if(Jobs_inprogress_lift_2[0][0]!=0)
 			{
 				i=0;
-				while(Jobs_inprogress_lift_1[i][0]!=0)
+				while(Jobs_inprogress_lift_1[i].Floor!=-1)
 				{
-					sendJob.id=Jobs_inprogress_lift_2[i][ID];
-					sendJob.targetFloor=Jobs_inprogress_lift_2[i][Floor];
+					sendJob.id=Jobs_inprogress_lift_2[i].Id;
+					sendJob.targetFloor=Jobs_inprogress_lift_2[i].Floor;
 					sendJob.success=0;
 
 					xQueueSend(_controllerToLiftB, &sendJob, 0);
@@ -273,43 +246,52 @@ void controller(void)
 	{
 		do
 		{
-			if(recJob.id==Jobs_inprogress_lift_1[i][ID])
+			if(recJob.id==Jobs_inprogress_lift_1[i].Id)
 			{
 				if(recJob.success==0)
 				{
-					Pending_orders[order][Floor]=Jobs_inprogress_lift_1[i][Floor];
-					Pending_orders[order][Direction]=Jobs_inprogress_lift_1[i][Direction];
-					Pending_orders[order][Lift]=Jobs_inprogress_lift_1[i][Lift];
-					Pending_orders[order][ID]=Jobs_inprogress_lift_1[i][ID];
+					Pending_orders[order]=Jobs_inprogress_lift_1[i];
 					order++;
 				}else if(recJob.success==1)
 				{
-					Jobs_inprogress_lift_1[i][Floor]=0;			//Auftrag lï¿½schen
-					Jobs_inprogress_lift_1[i][Direction]=0;
-					Jobs_inprogress_lift_1[i][Lift]=0;
-					Jobs_inprogress_lift_1[i][ID]=0;
+					Jobs_inprogress_lift_1[i]=noOrder;
 					inprogress_lift_1=Array_arrange_4(Jobs_inprogress_lift_1);
-//////////////////////////////////////////Licht löschen
+//////////////////////////////////////////Licht lï¿½schen
 				}
 			}
 			i++;
-		}while(recJob.id!=Jobs_inprogress_lift_1[i][ID]);
+		}while(recJob.id!=Jobs_inprogress_lift_1[i].Id);
 	}
 	while(xQeueReceive(_liftBToController,&recJob, TIME)!=0)
 	{
 
 	}
+	CARME_CAN_MESSAGE msg;
+	while(xQueueReceive(_canToController,&msg,TIME)!=0){
 
-	/*
-	 * Molllllleeeeeee
-	 *
-	 * Hier Can Message empfangen
-	 *
-	 *
-	 *
-	 *
-	 *
-	 */
+		Order newOrder;
+		if(msg.id>=0xC){
+			newOrder.Floor=(msg.data[2]&0xEF)%6;
+			newOrder.Direction=Stay;
+			newOrder.Id=currentId;
+			if(msg.id==0xC){
+				newOrder.Lift=Lift1;
+			} else {
+				newOrder.Lift=Lift2;
+			}
+		} else {
+			newOrder.Floor = msg.id/2;
+			newOrder.Direction = (msg.data[2] - 0xFB);
+			newOrder.Id = currentId;
+			newOrder.Lift = Outside;
+		}
+		if(checkValidOrder(newOrder)){
+			Pending_orders[order]=newOrder;
+			order++;
+			currentId
+		}
+	}
+
 	vTaskDelay(100);
 
 }
@@ -331,34 +313,57 @@ char Find_direction (char p[][2],char last_position)
 	}
 	// hï¿½chste oder tiefste position
 }
-char Array_arrange_4 (char p[][4]) //Array sortieren
+char Array_arrange_4 (Order p[]) //Array sortieren
 {
 	int i,j;
 	j=0;
 	for(i=0;i<Max;i++)
 	{
-		if(p[i][0]==0)
+		if(p[i].Floor==-1)
 		{
 			j++;
 		}
 		else
 		{
-			p[i-j][0]=p[i][0];
-			p[i-j][1]=p[i][1];
-			p[i-j][1]=p[i][2];
-			p[i-j][1]=p[i][3];
+			p[i-j]=p[i];
 			if(j!=0)
 			{
-				p[i][0]=0;
-				p[i][1]=0;
-				p[i][2]=0;
-				p[i][3]=0;
+				p[i]=noOrder;
 			}
 		}
 	}
 	return (Max-j);
 }
 
-
+int checkValidOrder(Order order){
+	if(1<=order.Floor&&order.Floor<=5){
+		return 0;
+	}
+	if(order.Direction>2){
+		return 0;
+	}
+	if(order.Lift>1){
+		return 0;
+	}
+	int i;
+	for(i=0;i<Max;i++){
+		if(Pending_orders[i].Direction==order.Direction &&
+				Pending_orders[i].Floor==order.Floor &&
+				Pending_orders[i].Lift==order.Lift){
+			return 0;
+		}
+		if(Jobs_inprogress_lift_1[i].Direction==order.Direction &&
+				Jobs_inprogress_lift_1[i].Floor==order.Floor &&
+				Jobs_inprogress_lift_1[i].Lift==order.Lift){
+			return 0;
+		}
+		if(Jobs_inprogress_lift_2[i].Direction==order.Direction &&
+				Jobs_inprogress_lift_2[i].Floor==order.Floor &&
+				Jobs_inprogress_lift_2[i].Lift==order.Lift){
+			return 0;
+		}
+	}
+	return 1;
+}
 
 
