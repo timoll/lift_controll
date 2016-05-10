@@ -57,19 +57,19 @@ Order Pending_orders [Max];
 Order Jobs_inprogress_lift_1 [Max];
 Order Jobs_inprogress_lift_2 [Max];
 const Order noOrder={-1,-1,-1,-1};
-char currentId=0;
-char possible_floors_lift_1[2];
-char possible_floors_lift_2[2];
+int currentId=0;
+int possible_floors_lift_1[2];
+int possible_floors_lift_2[2];
 
-char last_position_lift_1;
-char last_position_lift_2;
-char direction_lift_1;
-char direction_lift_2;
-char order;
-char inprogress_lift_1;
-char inprogress_lift_2;
+int last_position_lift_1;
+int last_position_lift_2;
+int direction_lift_1;
+int direction_lift_2;
+int order;
+int inprogress_lift_1;
+int inprogress_lift_2;
 
-char state=0;
+int state=0;
 
 Job sendJob = {0,0,0};
 Job recJob = {0,0,0};
@@ -224,7 +224,7 @@ void controller(void)
 			if(Jobs_inprogress_lift_2[0].Floor!=-1)
 			{
 				i=0;
-				while(Jobs_inprogress_lift_1[i].Floor!=-1)
+				while(Jobs_inprogress_lift_2[i].Floor!=-1)
 				{
 					sendJob.id=Jobs_inprogress_lift_2[i].Id;
 					sendJob.targetFloor=Jobs_inprogress_lift_2[i].Floor;
@@ -242,6 +242,7 @@ void controller(void)
 			state=Inform;
 			break;
 	}
+	CARME_CAN_MESSAGE msg;
 	i=0;
 	while(xQueueReceive(_liftAToController,&recJob, TIME)!=0)
 	{
@@ -255,19 +256,78 @@ void controller(void)
 					order++;
 				}else if(recJob.success==1)
 				{
+					msg.data[3]=Jobs_inprogress_lift_1[i].Floor;
+					msg.id=0xC;
+					xQueueSend(_toCan, &msg, 0);
+					if(direction_lift_1==Up)
+					{
+						msg.data[3]=0xF1;
+						msg.id=Jobs_inprogress_lift_1[i].Floor*2;
+						xQueueSend(_toCan, &msg, 0);
+						msg.data[3]=0xF1;
+						msg.id=Jobs_inprogress_lift_1[i].Floor*2+1;
+						xQueueSend(_toCan, &msg, 0);
+					}else if(direction_lift_1==Down)
+					{
+							msg.data[3]=0xF0;
+							msg.id=Jobs_inprogress_lift_1[i].Floor*2;
+							xQueueSend(_toCan, &msg, 0);
+							msg.data[3]=0xF0;
+							msg.id=Jobs_inprogress_lift_1[i].Floor*2+1;
+							xQueueSend(_toCan, &msg, 0);
+					}
 					Jobs_inprogress_lift_1[i]=noOrder;
 					inprogress_lift_1=Array_arrange_4(Jobs_inprogress_lift_1);
-//////////////////////////////////////////Licht l�schen
+
+
 				}
 			}
 			i++;
 		}while(recJob.id!=Jobs_inprogress_lift_1[i].Id);
 	}
+	i=0;
 	while(xQueueReceive(_liftBToController,&recJob, TIME)!=0)
 	{
+		do
+		{
+			if(recJob.id==Jobs_inprogress_lift_2[i].Id)
+			{
+				if(recJob.success==0)
+				{
+					Pending_orders[order]=Jobs_inprogress_lift_2[i];
+					order++;
+				}else if(recJob.success==1)
+				{
+					msg.data[3]=Jobs_inprogress_lift_2[i].Floor;
+					msg.id=0xD;
+					xQueueSend(_toCan, &msg, 0);
+					if(direction_lift_1==Up)
+					{
+						msg.data[3]=0xF1;
+						msg.id=Jobs_inprogress_lift_2[i].Floor*2;
+						xQueueSend(_toCan, &msg, 0);
+						msg.data[3]=0xF1;
+						msg.id=Jobs_inprogress_lift_2[i].Floor*2+1;
+						xQueueSend(_toCan, &msg, 0);
+					}else if(direction_lift_1==Down)
+					{
+						msg.data[3]=0xF0;
+						msg.id=Jobs_inprogress_lift_2[i].Floor*2;
+						xQueueSend(_toCan, &msg, 0);
+						msg.data[3]=0xF0;
+						msg.id=Jobs_inprogress_lift_2[i].Floor*2+1;
+						xQueueSend(_toCan, &msg, 0);
+					}
+					Jobs_inprogress_lift_2[i]=noOrder;
+					inprogress_lift_2=Array_arrange_4(Jobs_inprogress_lift_2);
 
+					xQueueSend(_toCan, &msg, 0);
+				}
+			}
+			i++;
+		}while(recJob.id!=Jobs_inprogress_lift_1[i].Id);
 	}
-	CARME_CAN_MESSAGE msg;
+	i=0;
 	while(xQueueReceive(_canToController,&msg,TIME)!=0){
 
 		Order newOrder;
@@ -288,6 +348,37 @@ void controller(void)
 		}
 		if(checkValidOrder(newOrder)){
 			Pending_orders[order]=newOrder;
+			if(Pending_orders[order].Lift==1)
+			{
+				msg.data[3]=Pending_orders[order].Floor+0x80;
+				msg.id=0xC;
+				xQueueSend(_toCan, &msg, 0);
+
+			}else if(Pending_orders[order].Lift==2)
+			{
+				msg.data[3]=Pending_orders[order].Floor+0x80;
+				msg.id=0xD;
+				xQueueSend(_toCan, &msg, 0);
+			}else
+			{
+				if(Pending_orders[order].Direction==Up)
+				{
+					msg.data[3]=0xFB;
+					msg.id=Pending_orders[order].Floor*2;
+					xQueueSend(_toCan, &msg, 0);
+					msg.data[3]=0xFB;
+					msg.id=Pending_orders[order].Floor*2+1;
+					xQueueSend(_toCan, &msg, 0);
+				}else if(Pending_orders[order].Direction==Down)
+				{
+					msg.data[3]=0xFC;
+					msg.id=Pending_orders[order].Floor*2;
+					xQueueSend(_toCan, &msg, 0);
+					msg.data[3]=0xFC;
+					msg.id=Pending_orders[order].Floor*2+1;
+					xQueueSend(_toCan, &msg, 0);
+				}
+			}
 			order++;
 			currentId++;
 		}
