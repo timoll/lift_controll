@@ -3,12 +3,20 @@
  *
  *  Created on: Apr 20, 2016
  *      Author: Swen
- */
+*/
 #include "task_communication.h"
+
 int initQueues()
 {
 	int error=0;
-
+	_zeroCanMessage.dlc=4;
+	_zeroCanMessage.ext=0;
+	_zeroCanMessage.id=0;
+	_zeroCanMessage.rtr=0;
+	int i=0;
+	for(i=0;i<8;i++){
+		_zeroCanMessage.data[i]=0;
+	}
 	_canToLift = xQueueCreate( 20, sizeof(CARME_CAN_MESSAGE) );
 	_canToController = xQueueCreate( 20, sizeof(CARME_CAN_MESSAGE) );
 	_toCan = xQueueCreate( 20, sizeof(CARME_CAN_MESSAGE) );

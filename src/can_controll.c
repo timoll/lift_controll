@@ -15,18 +15,16 @@
 void readCanMessageIRQ () {
 	CARME_CAN_MESSAGE msg;
 	ERROR_CODES error;
-	for(;;){
-		error = CARME_CAN_Read(&msg);
+	error = CARME_CAN_Read(&msg);
 
-		if (error == CARME_NO_ERROR) {
-			if(msg.id<=0x01) {
-				xQueueSendFromISR(_canToLift, &msg, portMAX_DELAY);
-			} else if (msg.id <= 0x0B) {
-				xQueueSendFromISR(_canToLift, &msg, portMAX_DELAY);
-				xQueueSendFromISR(_canToController, &msg, portMAX_DELAY);
-			} else if(msg.id <= 0x0D){
-				xQueueSendFromISR(_canToController, &msg, portMAX_DELAY);
-			}
+	if (error == CARME_NO_ERROR) {
+		if(msg.id<=0x01) {
+			xQueueSendFromISR(_canToLift, &msg, 0);
+		} else if (msg.id <= 0x0B) {
+			xQueueSendFromISR(_canToLift, &msg,0);
+			xQueueSendFromISR(_canToController, &msg, 0);
+		} else if(msg.id <= 0x0D){
+			xQueueSendFromISR(_canToController, &msg, 0);
 		}
 	}
 }

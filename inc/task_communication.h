@@ -18,7 +18,7 @@ typedef struct _Job{
 	int targetFloor;
 	int success;
 }Job;
-
+CARME_CAN_MESSAGE _zeroCanMessage;//= {0,0,0,4,{0,0,0,0,0,0,0,0}}; //default Message
 
 int initQueues();
 
