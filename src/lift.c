@@ -186,7 +186,7 @@ int initLift(int id)
 	}
 	int finished=0;
 	moveUp(id);
-	vTaskDelay(250);
+	vTaskDelay(1000);
 	moveDown(id);
 
 	while(finished!=1)
@@ -200,8 +200,10 @@ int initLift(int id)
 		}
 	}
 	xSemaphoreGive(_initLift);
-	vTaskDelay(500);
-	xSemaphoreTake(_initLift, portMAX_DELAY);
+	vTaskDelay(100);
+	while(!xSemaphoreTake(_initLift, 10)){
+		getInformation(id);
+	}
 	xSemaphoreGive(_initLift);
 	return finished;
 }

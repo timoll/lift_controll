@@ -92,6 +92,7 @@ void controller(void)
 {
 	int i;
 	//wichtige informationen updaten
+	//while(1);
 	while(1){
 	switch (state)
 	{
@@ -206,10 +207,10 @@ void controller(void)
 			break;
 
 		case Inquiry:
-			if(Jobs_inprogress_lift_1[0].Floor!=-1)
+			if(Jobs_inprogress_lift_1[0].Floor!=0)
 			{
 				i=0;
-				while(Jobs_inprogress_lift_1[i].Floor!=-1)
+				while(Jobs_inprogress_lift_1[i].Floor!=0)
 				{
 					sendJob.id=Jobs_inprogress_lift_1[i].Id;
 					sendJob.targetFloor=Jobs_inprogress_lift_1[i].Floor;
@@ -221,10 +222,10 @@ void controller(void)
 				}
 				//in queue schreiben
 			}
-			if(Jobs_inprogress_lift_2[0].Floor!=-1)
+			if(Jobs_inprogress_lift_2[0].Floor!=0)
 			{
 				i=0;
-				while(Jobs_inprogress_lift_1[i].Floor!=-1)
+				while(Jobs_inprogress_lift_1[i].Floor!=0)
 				{
 					sendJob.id=Jobs_inprogress_lift_2[i].Id;
 					sendJob.targetFloor=Jobs_inprogress_lift_2[i].Floor;
@@ -338,13 +339,13 @@ char Array_arrange_4 (Order p[]) //Array sortieren
 }
 
 int checkValidOrder(Order order){
-	if(1<=order.Floor&&order.Floor<=5){
+	if(1>=order.Floor||order.Floor>=5){
 		return 0;
 	}
-	if(order.Direction>2){
+	if(order.Direction>2||order.Direction<0){
 		return 0;
 	}
-	if(order.Lift>1){
+	if(order.Lift>2|| order.Lift<0){
 		return 0;
 	}
 	int i;
