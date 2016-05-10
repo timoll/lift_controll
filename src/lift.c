@@ -181,7 +181,7 @@ void finishedJob(int level, int id)
 //
 int initLift(int id)
 {
-	while(!xSemaphoreTake(_initLift, portMAX_DELAY)){
+	while(!xSemaphoreTake(_initLift, 10)){
 		getInformation(id);
 	}
 	int finished=0;
@@ -199,6 +199,9 @@ int initLift(int id)
 			finished=1;
 		}
 	}
+	xSemaphoreGive(_initLift);
+	vTaskDelay(500);
+	xSemaphoreTake(_initLift, portMAX_DELAY);
 	xSemaphoreGive(_initLift);
 	return finished;
 }

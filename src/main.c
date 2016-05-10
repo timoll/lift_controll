@@ -91,8 +91,8 @@ int main(void)
 
 	/* create tasks */
 	xTaskCreate(sendCanMessage,  (const signed char * const)"Send Can Message",  1024, NULL, 4, NULL);
-
 	//xTaskCreate(writeCanMessage, (const signed char * const)"Write Can Message", 1024, NULL, 4, NULL);
+
 	xTaskCreate(lift,(const signed char * const)"LiftA", 1024, (void*)0, 4, NULL);
 	xTaskCreate(lift,(const signed char * const)"LiftB", 1024, (void*)1, 4, NULL);
 
