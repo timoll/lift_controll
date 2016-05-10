@@ -54,6 +54,7 @@ xSemaphoreHandle Muxtex_Can_Tx;
 xSemaphoreHandle Muxtex_Display;
 xQueueHandle     Queue_Can_Rx;
 
+
 /*----- Implementation -----------------------------------------------------*/
 /**
  * @brief		main
@@ -92,7 +93,8 @@ int main(void)
 	xTaskCreate(sendCanMessage,  (const signed char * const)"Send Can Message",  1024, NULL, 4, NULL);
 
 	//xTaskCreate(writeCanMessage, (const signed char * const)"Write Can Message", 1024, NULL, 4, NULL);
-	xTaskCreate(lift,(const signed char * const)"Lift", 1024, NULL, 4, NULL);
+	xTaskCreate(lift,(const signed char * const)"LiftA", 1024, (void*)0, 4, NULL);
+	xTaskCreate(lift,(const signed char * const)"LiftB", 1024, (void*)1, 4, NULL);
 
 	xTaskCreate(controller,  (const signed char * const)"controller",  1024, NULL, 4, NULL);
 	initQueues();

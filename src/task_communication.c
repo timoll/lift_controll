@@ -8,6 +8,7 @@
 
 int initQueues()
 {
+	_initLift  = xSemaphoreCreateMutex();
 	int error=0;
 	_zeroCanMessage.dlc=4;
 	_zeroCanMessage.ext=0;

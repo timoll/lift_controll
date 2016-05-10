@@ -12,6 +12,7 @@ xQueueHandle _controllerToLiftA;
 xQueueHandle _controllerToLiftB;
 xQueueHandle _liftAToController;
 xQueueHandle _liftBToController;
+xSemaphoreHandle _initLift;
 
 typedef struct _Job{
 	int id;

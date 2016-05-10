@@ -8,26 +8,17 @@
 #include "lift.h"
 
 //Data
-int endschalterA;
-int endschalterB;
-int AstillMoveUP=0,AstillMoveDOWN=0;
-int BstillMoveUP=0,BstillMoveDOWN=0;
-int levelB;//represents the current floor
-int levelA;//represents the current floor
-int almost_A;
-int almost_B;
-int liftName;
-int acceptedA[5]={0},  acceptedB[5]={0};
-int directionA=STILL;//Variable to store the actual direction
-int directionB=STILL;//Variable to store the actual direction
+int endschalter[2];
+int stillMoveUP[2]={0},stillMoveDOWN[2]={0};
+int level[2];
+int almost[2];
+int accepted[2][5]={{0},{0}};
+int direction[2]={STILL,STILL};//Variable to store the actual direction
 
-int posLifty=10;
-int posLiftx=10;
 
-int StoppLevelA[5];//indicates the floors where the elevator needs to stopp
-int StoppLevelB[5];//indicates the floors where the elevator needs to stopp
+int StoppLevel[2][5];//indicates the floors where the elevator needs to stopp
 
-char liftString[40];
+char liftString[2][40];
 
 //Settings
 int queueTime=10;
@@ -35,63 +26,37 @@ int messageLength=4;
 //#define LIFT_B //Both elevators activatet
 
 //array to save the jobs that where accepted in order to inform controller about finished jobs
-Job acceptedJobA[5][5];
-Job acceptedJobB[5][5];
-Job noJob={0,0,0};
+Job acceptedJob[2][5][5];
+Job noJob= {0,0,0};
 
-typedef enum _doorState{close,toOpen, opening, closing}doorState;
-typedef enum _liftState{stay, up, down, toStay, toUp, toDown};
-liftState liftAState;
-liftState liftBState;
-doorState doorStateA[5]={0};
-doorState doorStateB[5]={0};
 //transform CanMessage
-void getInformation(void)
+
+/**
+ * @getInformation process can Message and consumes it if the id matches
+ * @return 1 when message was consumed, 0 when no message available or id didn't matches
+ */
+int getInformation(int id)
 {
 	CARME_CAN_MESSAGE receivedMessage;
 	//Set Endschalter!!!
-	if(xQueueReceive(_canToLift, &receivedMessage, queueTime)){//write the contant into receivedMessage
-		liftName = receivedMessage.id %2; //find out which elevator is meant
-		switch (liftName)
-		{
-			case 0: //Lift A
-				endschalterA = receivedMessage.data[0];
-				break;
-			case 1:	//Lift B
-				endschalterB = receivedMessage.data[0];
-				break;
-		}
-		//Set LEVEL!!!
+	if(xQueuePeek(_canToLift, &receivedMessage, queueTime)){//write the contant into receivedMessage
+		int liftName = receivedMessage.id %2; //find out which elevator is meant
+		if(liftName == id){
+			endschalter[id] = receivedMessage.data[0];
 
-		/* Level 1 =>1
-		 * Level 2 =>2
-		 * Level 3 =>3
-		 * Level 4 =>4
-		 * Level 5 =>5
-		 * Level 6 =>6
-		 * same for levelAalmost*/
-		//set LevelA
-		if(((endschalterA & 0x01)) &&(receivedMessage.id%2==0))//reached floor and ID is For Elevator A
-		{
-			levelA=receivedMessage.id/2;
-		}
 
-		if(((endschalterA & 0x02)) &&(receivedMessage.id%2==0))//close to floor and ID is for ElevatorA
-		{
-			almost_A=receivedMessage.id/2;
-		}
-		//set LevelB
+			if(endschalter[id] & 0x01) {//reached floor and ID is For Elevator A
+				level[id]=(receivedMessage.id)/2;
+			}
 
-		if(((endschalterB & 0x01)) && (receivedMessage.id%2!=0))//reached floor and ID is not for Elevator A
-{
-			levelB=(receivedMessage.id-1)/2;
-		}
-
-		if(((endschalterB & 0x02)) && (receivedMessage.id%2!=0))//close to floor and ID is not for Elevator A
-		{
-			almost_B=(receivedMessage.id-1)/2;
+			if(endschalter[id] & 0x02) { //close to floor and ID is for ElevatorA
+				almost[id]=(receivedMessage.id)/2;
+			}
+			xQueueReceive(_canToLift, &receivedMessage, queueTime);
+			return 1;
 		}
 	}
+	return 0;
 }
 
 //functions to controll elevator-door
@@ -137,6 +102,9 @@ void reachedDestination(int address)//Choose which motor
 
 	CARME_CAN_MESSAGE msg=_zeroCanMessage;
 	msg.id  = address;
+	char string[20];
+	sprintf(string,"reached by %d",address);
+	LCD_DisplayStringXY(10, 10, string);
 	xQueueSend(_toCan,&msg,queueTime);
 }
 void allmostReachedUp(int address)//Choose which motor
@@ -168,7 +136,7 @@ void moveUp(int address)//Choose which motor
 	 */
 
 	CARME_CAN_MESSAGE msg=_zeroCanMessage;
-		msg.id  = address;
+	msg.id  = address;
 	msg.data[2]=0x04;//up & fast
 	xQueueSend(_toCan,&msg,queueTime);
 }
@@ -185,199 +153,76 @@ void moveDown(int address)//Choose which motor
 }
 
 //functions to manage jobs
-void addJobA(Job newJob, int level)
+void addJob(Job newJob, int level, int id)
 {
-	acceptedJobA[level-1][acceptedA[level-1]]=newJob;
-	acceptedA[level-1]++;
+	acceptedJob[id][level-1][accepted[id][level-1]]=newJob;
+	accepted[id][level-1]++;
 }
-void addJobB(Job newJob, int level)
-{
-	acceptedJobB[level-1][acceptedB[level-1]]=newJob;
-	acceptedB[level-1]++;
-}
-void sendJobA(int level)
+void finishedJob(int level, int id)
 {
 	int i;
 	for(i=0;i<5;i++)
 	{
-
-		if(acceptedJobA[level-1][i].targetFloor!=0){
-			acceptedJobA[level-1][i].success=1; //set Succes bit
-			xQueueSend(_liftAToController, &acceptedJobA[level-1][i],queueTime);//inform the Controller
-			acceptedJobA[level-1][i]=noJob;//erase all Jobs done
+		if(acceptedJob[id][level-1][i].targetFloor!=0){
+			acceptedJob[id][level-1][i].success=1; //set Succes bit
+			if(id){
+				xQueueSend(_liftBToController, &acceptedJob[level-1][i],queueTime);//inform the Controller
+			} else {
+				xQueueSend(_liftAToController, &acceptedJob[level-1][i],queueTime);//inform the Controller
+			}
+			acceptedJob[id][level-1][i]=noJob;//erase all Jobs done
 			//set counter to Zero
 		}
 
 	}
-	acceptedA[level-1]=0;
+	accepted[id][level-1]=0;
 
 }
-void sendJobB(int level)
-{
-	int i;
-	for(i=0;i<5;i++)
-	{
-		if(acceptedJobB[level-1][i].targetFloor!=0){
-			acceptedJobB[level-1][i].success=1; //set Succes bit
-			xQueueSend(_liftBToController, &acceptedJobB[level-1][i],queueTime);//inform the Controller
-			acceptedJobB[level-1][i]=noJob;//erase all Jobs done
-		}
-	}
-	acceptedB[level-1]=0;
-}
-
 //
-int initLiftA(void)
+int initLift(int id)
 {
+	while(!xSemaphoreTake(_initLift, portMAX_DELAY)){
+		getInformation(id);
+	}
 	int finished=0;
-	moveUp(motorA);
+	moveUp(id);
 	vTaskDelay(250);
-	moveDown(motorA);
+	moveDown(id);
 
 	while(finished!=1)
 	{
-		getInformation();
+		getInformation(id);
 
-		if((levelA==1)&&(endschalterA & 0x01))
+		if((level[id]==1)&&(endschalter[id] & 0x01))
 		{
-			reachedDestination(motorA);//turn off motorA
+			reachedDestination(id);//turn off motorA
 			finished=1;
 		}
 	}
-	return finished;
-
-
-}
-int initLiftB(void)
-{
-	int finished=0;
-	moveUp(motorB);
-	vTaskDelay(250);
-	moveDown(motorB);
-
-	while(finished!=1)
-	{
-		getInformation();
-
-		if((levelB==1)&&(endschalterB & 0x01))
-		{
-			reachedDestination(motorB);//turn off motorB
-			finished=1;
-		}
-	}
+	xSemaphoreGive(_initLift);
 	return finished;
 }
 
-void doorControl(){
 
-	for(i=0;i<5;i++){
-		switch(doorStateA[i]){
-			case toOpen:
-				openDoor(levelA*2);
-				doorStateA[i]=opening;
-				break;
-			case opening:
-				if(endschalterA & 0x08){
-					stoppDoor(levelA*2);
-					closeDoor(levelA*2);
-					doorStateA[i]=closing;
-				}
-				break;
-			case closing:
-				if(endschalterA & 0x04){
-					closeDoor(levelA*2);
-					StoppLevelA[levelA-1]=0;
-					doorStateA[i]=close;
-				}
-				break;
-		}
-		switch(doorStateB[i]){
-			case toOpen:
-				openDoor(levelB*2+1);
-				doorStateB[i]=opening;
-				break;
-			case opening:
-				if(endschalterB & 0x08){
-					stoppDoor(levelB*2+1);
-					closeDoor(levelB*2+1);
-					doorStateB[i]=closing;
-				}
-				break;
-			case closing:
-				if(endschalterA & 0x04){
-					stoppDoor(levelB*2+1);
-					StoppLevelB[levelB-1]=0;
-					doorStateB[i]=close;
-				}
-				break;
-		}
-	}
-}
-void liftAFSM(){
-	switch(liftAState){
-	case stay:
-		break;
-	case up:
-		break;
-	case down:
-		break;
-	case toStay:
-		break;
-	case toUp:
-		break;
-	case toDown:
-		break;
-	}
-}
-void readJobs(){
-	while(xQueueReceive( _controllerToLiftA, &RXJobA , 10 )){
-		if((directionA == UP) && (RXJobA.targetFloor > levelA)) {//Moving Upwards and the level is above
-
-						StoppLevelA[RXJobA.targetFloor-1]=1; //set a mark where I need to stopp the elevator
-						addJobA(RXJobA,RXJobA.targetFloor);//strore the Job
-
-					} else if((directionA == DOWN) && (RXJobA.targetFloor < levelA)) {//Moving Downwards and the level is underneath
-						StoppLevelA[RXJobA.targetFloor-1]=1;
-						addJobA(RXJobA,RXJobA.targetFloor);//store the job
-							//say to strategie the job is accepted
-					} else if(directionA == STILL){//Not moving
-						if(levelA < RXJobA.targetFloor ){//the Level is above
-							directionA=UP;
-							StoppLevelA[RXJobA.targetFloor-1]=1;
-							addJobA(RXJobA,RXJobA.targetFloor);//store the job
-						}
-						if(levelA > RXJobA.targetFloor ){//the Level is underneath
-							directionA=DOWN;
-							StoppLevelA[RXJobA.targetFloor-1]=1;
-							addJobA(RXJobA,RXJobA.targetFloor);//store the job
-						}
-					} else {
-						TXJobA=RXJobA;
-						TXJobA.success=0;	//tell contorller Job is not accepted
-						xQueueSend(_liftAToController,&TXJobA,10);
-						//StoppLevelA[RXJobA.targetFloor-1]=0;
-						//Say to Strategie the job is not accepted
-					}
-	}
-}
 //Task-Code
 void lift(void *pvargs)
 {
 
+	int id=(int)(pvargs);
 	//used for saving the current job received from controller
-	Job RXJobA;
-	Job RXJobB;
-	Job TXJobA;
-	Job TXJobB;
-
-	initLiftA();
-	initLiftB();
-
+	Job RXJob;
+	Job TXJob;
+//	if(id==1){
+//		while(1){
+//			getInformation(id);
+//		}
+//	}
+	initLift(id);
 	for(;;){
-		getInformation();
-		doorControll();
-		sprintf(liftString, "endA:%x, endB:%x levelA:%d  LevelB:%d", endschalterA, endschalterB, levelA, levelB);
-		LCD_DisplayStringXY(posLiftx, posLifty,liftString);
+		while(getInformation(id));
+		//doorControll();
+		//sprintf(liftString, "endA:%x, endB:%x levelA:%d  LevelB:%d", endschalterA, endschalterB, levelA, levelB);
+		//LCD_DisplayStringXY(posLiftx, posLifty,liftString);
 
 
 		//Procedure
@@ -388,33 +233,43 @@ void lift(void *pvargs)
 		//1a)-------------------------------------------------------------------------------------------------------------------------
 
 		//writes the Message of the queue into RXJobA
-		if( xQueueReceive( _controllerToLiftA, &RXJobA , 10 )) {
-			if((directionA == UP) && (RXJobA.targetFloor > levelA)) {//Moving Upwards and the level is above
+		int messageRecived;
+		if(id == 0){
+			messageRecived = xQueueReceive( _controllerToLiftA, &RXJob , 10 );
+		} else {
+			messageRecived = xQueueReceive( _controllerToLiftB, &RXJob , 10 );
+		}
+		if(messageRecived) {
+			if((direction[id] == UP) && (RXJob.targetFloor > level[id])) {//Moving Upwards and the level is above
 
-				StoppLevelA[RXJobA.targetFloor-1]=1; //set a mark where I need to stopp the elevator
-				addJobA(RXJobA,RXJobA.targetFloor);//strore the Job
+				StoppLevel[id][RXJob.targetFloor-1] = 1; //set a mark where I need to stopp the elevator
+				addJob(RXJob,RXJob.targetFloor,id);//strore the Job
 
-			} else if((directionA == DOWN) && (RXJobA.targetFloor < levelA)) {//Moving Downwards and the level is underneath
-				StoppLevelA[RXJobA.targetFloor-1]=1;
-				addJobA(RXJobA,RXJobA.targetFloor);//store the job
+			} else if((direction[id] == DOWN) && (RXJob.targetFloor < level[id])) {//Moving Downwards and the level is underneath
+				StoppLevel[id][RXJob.targetFloor-1]=1;
+				addJob(RXJob,RXJob.targetFloor,id);//store the job
 					//say to strategie the job is accepted
-			} else if(directionA == STILL){//Not moving
-				if(levelA < RXJobA.targetFloor ){//the Level is above
-					directionA=UP;
-					StoppLevelA[RXJobA.targetFloor-1]=1;
-					addJobA(RXJobA,RXJobA.targetFloor);//store the job
-					moveUp(motorA);
+			} else if(direction[id] == STILL){//Not moving
+				if(level[id] < RXJob.targetFloor ){//the Level is above
+					direction[id]=UP;
+					StoppLevel[id][RXJob.targetFloor-1]=1;
+					addJob(RXJob,RXJob.targetFloor,id);//store the job
+					moveUp(id);
 				}
-				if(levelA > RXJobA.targetFloor ){//the Level is underneath
-					directionA=DOWN;
-					StoppLevelA[RXJobA.targetFloor-1]=1;
-					addJobA(RXJobA,RXJobA.targetFloor);//store the job
-					moveDown(motorA);
+				if(level[id] > RXJob.targetFloor ){//the Level is underneath
+					direction[id]=DOWN;
+					StoppLevel[id][RXJob.targetFloor-1]=1;
+					addJob(RXJob,RXJob.targetFloor,id);//store the job
+					moveDown(id);
 				}
 			} else {
-				TXJobA=RXJobA;
-				TXJobA.success=0;	//tell contorller Job is not accepted
-				xQueueSend(_liftAToController,&TXJobA,10);
+				TXJob=RXJob;
+				TXJob.success=0;	//tell contorller Job is not accepted
+				if(id){
+					xQueueSend(_liftBToController,&TXJob,10);
+				} else {
+					xQueueSend(_liftAToController,&TXJob,10);
+				}
 				//StoppLevelA[RXJobA.targetFloor-1]=0;
 				//Say to Strategie the job is not accepted
 			}
@@ -422,167 +277,73 @@ void lift(void *pvargs)
 			//Is there to start the whole elevator first Job defines the direction!!!
 			//and if there is no Job for long time, the elevator will have direction=STILL
 
-			sprintf(liftString, "DirectionA:%d", directionA);
-			LCD_DisplayStringXY(posLiftx, posLifty,liftString);
 		 }
-
-#ifndef LIFT_B
-		//1b)-------------------------------------------------------------------------------------------------------------------------
-		 if( xQueueReceive( _controllerToLiftB, &RXJobB ,  10 )) //writes the Message of the queue into RXJobB
-		 {
-			if((directionB==UP) && (RXJobB.targetFloor > levelB)){//Moving Upwards and the level is above
-				StoppLevelB[RXJobB.targetFloor-1]=1; //set a mark where I need to stop
-				addJobB(RXJobB,RXJobB.targetFloor);
-				//say to strategie the job is accepted
-			}
-			else if	((directionB==DOWN) && (RXJobB.targetFloor < levelB)){//Moving Downwards and the level is underneath
-
-				StoppLevelB[RXJobB.targetFloor-1]=1;
-				addJobB(RXJobB,RXJobB.targetFloor);
-				//say to strategie the job is accepted
-			}
-			else if(directionB == STILL)	{//Not moving
-				if(levelB < RXJobB.targetFloor ){//the Level is above
-					directionB=UP;
-					StoppLevelB[RXJobB.targetFloor-1]=1;
-					addJobB(RXJobB,RXJobB.targetFloor);//store the job
-					moveUp(motorB);
-				}
-				if(levelB > RXJobB.targetFloor ){//the Level is underneath
-					directionB=DOWN;
-					StoppLevelB[RXJobB.targetFloor-1]=1;
-					addJobB(RXJobB,RXJobB.targetFloor);//store the job
-					moveDown(motorB);
-				}
-			}else {
-				TXJobB=RXJobB;
-				TXJobB.success=0;	//tell controller Job is not accepted
-				xQueueSend(_liftBToController, &TXJobB,10);
-				//StoppLevelB[RXJobB.targetFloor-1]=0;
-				//Say to Strategie the job is not accepted
-			}
-
-
-			sprintf(liftString, "DirectionA:%d, DirectionB:%d", directionA, directionB);
-			LCD_DisplayStringXY(posLiftx, posLifty,liftString);
-		 }
-#endif //LIFT_B
 
 		 //2a)-------------------------------------------------------------------------------------------------------------------------
-		if((endschalterA & 0x02) && (StoppLevelA[almost_A-1] == 1) && (directionA == UP)){//almost reached and near-switch pressed
-			allmostReachedUp(motorA);
+		if((endschalter[id] & 0x02) && (StoppLevel[id][almost[id]-1] == 1) && (direction[id] == UP)){//almost reached and near-switch pressed
+			allmostReachedUp(id);
 		}
 
-		if((endschalterA & 0x02) && (StoppLevelA[almost_A-1] == 1) && (directionA == DOWN)){//almost reached and near-switch pressed
-			allmostReachedDown(motorA);
+		if((endschalter[id] & 0x02) && (StoppLevel[id][almost[id]-1] == 1) && (direction[id] == DOWN)){//almost reached and near-switch pressed
+			allmostReachedDown(id);
 		}
-#ifndef LIFT_B
-		 //2b)-------------------------------------------------------------------------------------------------------------------------
-		if((endschalterB & 0x02) && (StoppLevelB[almost_B-1] == 1) && (directionB == UP)){//almost reached and near-switch pressed
-			allmostReachedUp(motorB);
-		}
-
-		if((endschalterB == 0x02) && (StoppLevelB[almost_B-1] == 1) && (directionB == DOWN)){//almost reached and near-switch pressed
-			allmostReachedDown(motorB);
-		}
-#endif //LIFT_B
 
 		//3a)-------------------------------------------------------------------------------------------------------------------------
-		if((endschalterA & 0x01) && (StoppLevelA[levelA-1] == 1)) {// reached and StoppLevelA Bit is (set LevelA-1) is necessary because the first level is 1, but I need an Index of 0
-			reachedDestination(motorA);//Stops the motor
+		if((endschalter[id] & 0x01) && (StoppLevel[id][level[id]-1] == 1)) {// reached and StoppLevelA Bit is (set LevelA-1) is necessary because the first level is 1, but I need an Index of 0
+			reachedDestination(id);//Stops the motor
 
-			doorStateA[levelA-1]=toOpen;
+			openDoor(level[id]*2+id);//(levelA*2) is necessary to translate for example LevelA=1 to the define stock1A=0x02 which is the address for the Can-Message
+
+			while(!(endschalter[id] & 0x08)){//door open
+				vTaskDelay(10);
+				getInformation(id);
+			}
+			stoppDoor(level[id]*2+id);
+			StoppLevel[id][level[id]-1]=0; //erase the Bit because the Job is done
+			closeDoor(level[id]*2+id);
+			while(!(endschalter[id] & 0x04) ){//door closed
+				vTaskDelay(10);
+				getInformation(id);
+			}
+			stoppDoor(level[id]*2);
 			//Check if there are still some jobs I need to do
-			if(directionA==UP){
+			if(direction[id]==UP){
 				int i;
-				AstillMoveUP=0;
-				for(i=levelA;i<5;i++){
-					if(StoppLevelA[i]==1){
-						AstillMoveUP=1;
+				stillMoveUP[id]=0;
+				for(i=level[id];i<5;i++){
+					if(StoppLevel[id][i]==1){
+						stillMoveUP[id]=1;
 					}
 				}
-				if(AstillMoveUP==1){
-					directionA=UP;//set Direction
-					moveUp(motorA);//move elavator
-					LCD_DisplayStringXY(posLiftx, posLifty,"                                   ");//erase all characters left
-					LCD_DisplayStringXY(posLiftx, posLifty,"A still move up ");
+				if(stillMoveUP[id]==1){
+					direction[id]=UP;//set Direction
+					moveUp(id);//move elavator
 				}
-				if(AstillMoveUP==0){
-					directionA=STILL;
-					LCD_DisplayStringXY(posLiftx, posLifty,"still           ");
+				if(stillMoveUP==0){
+					direction[id]=STILL;
 				}
 			}
-			if(directionA==DOWN){
-							int i;
-							AstillMoveDOWN=0;
-							for(i=0;i<levelA;i++){
-								if(StoppLevelA[i]==1){
-									AstillMoveDOWN=1;
-								}
-							}
-							if(AstillMoveDOWN==1){
-								directionA=DOWN;//set Direction
-								moveDown(motorA);//move elavator
-								LCD_DisplayStringXY(posLiftx, posLifty,"                                   ");//erase all characters left
-								LCD_DisplayStringXY(posLiftx, posLifty,"A still move up ");
-							}
-							if(AstillMoveDOWN==0){
-								directionA=STILL;
-								LCD_DisplayStringXY(posLiftx, posLifty,"still           ");
-							}
+			if(direction[id]==DOWN){
+				int i;
+				stillMoveDOWN[id]=0;
+				for(i=0;i<level[id];i++){
+					if(StoppLevel[id][i]==1){
+						stillMoveDOWN[id]=1;
+					}
+				}
+				if(stillMoveDOWN[id]==1){
+					direction[id]=DOWN;//set Direction
+					moveDown(id);//move elavator
+				}
+				if(stillMoveDOWN[id]==0){
+					direction[id]=STILL;
+				}
 						}
 			//Job is done
 
-			sendJobA(levelA-1);//Inform of the finished Jobs
-			LCD_DisplayStringXY(posLiftx, posLifty,"A reached destination");
+			finishedJob(level[id]-1,id);//Inform of the finished Jobs
 		}
-#ifndef LIFT_B
-		//3b)-------------------------------------------------------------------------------------------------------------------------
-		if((endschalterB & 0x01) && (StoppLevelB[levelB-1] == 1)) {
-		if(directionB==UP){
-			int i;
-			BstillMoveUP=0;
-			for(i=levelB;i<5;i++){
-				if(StoppLevelB[i]==1){
-					BstillMoveUP=1;
-				}
-			}
-			if(BstillMoveUP==1){
-				directionB=UP;//set Direction
-				moveUp(motorB);//move elavator
-				LCD_DisplayStringXY(posLiftx, posLifty,"                                   ");//erase all characters left
-				LCD_DisplayStringXY(posLiftx, posLifty,"A still move up ");
-			}
-			if(BstillMoveUP==0){
-				directionB=STILL;
-				LCD_DisplayStringXY(posLiftx, posLifty,"still           ");
-			}
-		}
-		if(directionB==DOWN){
-			int i;
-			BstillMoveDOWN=0;
-			for(i=0;i<levelB;i++){
-				if(StoppLevelB[i]==1){
-					BstillMoveDOWN=1;
-				}
-			}
-			if(BstillMoveDOWN==1){
-				directionB=DOWN;//set Direction
-				moveDown(motorB);//move elavator
-				LCD_DisplayStringXY(posLiftx, posLifty,"                                   ");//erase all characters left
-				LCD_DisplayStringXY(posLiftx, posLifty,"A still move up ");
-			}
-			if(BstillMoveDOWN==0){
-				directionB=STILL;
-				LCD_DisplayStringXY(posLiftx, posLifty,"still           ");
-			}
-		}
-		//Job is done
-
-		sendJobB(levelB-1);//Inform of the finished Jobs
-		LCD_DisplayStringXY(posLiftx, posLifty,"A reached destination");
-	}
-#endif //LIFT_B
 		vTaskDelay(35);
 	}
 }
+

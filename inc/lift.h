@@ -26,20 +26,6 @@ CARME_CAN_MESSAGE msg;
 #define UP 		1
 #define STILL 	2
 
-#define motorA 		0x00
-#define motorB 		0x01
-#define stock1A 	0x02
-#define stock1B 	0x03
-#define stock2A 	0x04
-#define stock2B 	0x05
-#define stock3A 	0x06
-#define stock3B 	0x07
-#define stock4A 	0x08
-#define stock4B 	0x09
-#define stock5A 	0x0A
-#define stock5B 	0x0B
-
-
 //Function Prototype
  void openDoor(int address);
  void closeDoor(int address);
@@ -49,13 +35,10 @@ CARME_CAN_MESSAGE msg;
  void allmostReachedDown(int address);
  void moveUp(int address);
  void moveDown(int address);
- void getInformation(void);
- void doorControll();
- void LiftAFSM();
+int getInformation(int);
 
 extern void lift(void *pvargs);
-extern int initLiftA(void);
-extern int initLiftB(void);
+extern int initLift(int);
 
 
 
