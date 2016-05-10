@@ -346,7 +346,7 @@ void lift(void *pvargs)
 						}
 			//Job is done
 
-			finishedJob(level[id]-1,id);//Inform of the finished Jobs
+			finishedJob(level[id],id);//Inform of the finished Jobs
 		}
 		vTaskDelay(35);
 	}
