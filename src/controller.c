@@ -92,6 +92,7 @@ void controller(void)
 {
 	int i;
 	//wichtige informationen updaten
+	while(1){
 	switch (state)
 	{
 		case Inform:
@@ -242,7 +243,7 @@ void controller(void)
 			break;
 	}
 	i=0;
-	while(xQeueReceive(_liftAToController,&recJob, TIME)!=0)
+	while(xQueueReceive(_liftAToController,&recJob, TIME)!=0)
 	{
 		do
 		{
@@ -262,7 +263,7 @@ void controller(void)
 			i++;
 		}while(recJob.id!=Jobs_inprogress_lift_1[i].Id);
 	}
-	while(xQeueReceive(_liftBToController,&recJob, TIME)!=0)
+	while(xQueueReceive(_liftBToController,&recJob, TIME)!=0)
 	{
 
 	}
@@ -271,7 +272,7 @@ void controller(void)
 
 		Order newOrder;
 		if(msg.id>=0xC){
-			newOrder.Floor=(msg.data[2]&0xEF)%6;
+			newOrder.Floor=(msg.data[1]&0xEF)%6;
 			newOrder.Direction=Stay;
 			newOrder.Id=currentId;
 			if(msg.id==0xC){
@@ -281,7 +282,7 @@ void controller(void)
 			}
 		} else {
 			newOrder.Floor = msg.id/2;
-			newOrder.Direction = (msg.data[2] - 0xFB);
+			newOrder.Direction = (msg.data[1] - 0xFB);
 			newOrder.Id = currentId;
 			newOrder.Lift = Outside;
 		}
@@ -292,7 +293,8 @@ void controller(void)
 		}
 	}
 
-	vTaskDelay(100);
+	vTaskDelay(50);
+	}
 
 }
 

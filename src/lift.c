@@ -482,5 +482,5 @@ void lift(void *pvargs)
 	}
 #endif //LIFT_B
 		vTaskDelay(35);
-	}
+
 }
