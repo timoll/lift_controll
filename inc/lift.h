@@ -50,6 +50,8 @@ CARME_CAN_MESSAGE msg;
  void moveUp(int address);
  void moveDown(int address);
  void getInformation(void);
+ void doorControll();
+ void LiftAFSM();
 
 extern void lift(void *pvargs);
 extern int initLiftA(void);
