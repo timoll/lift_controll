@@ -81,8 +81,8 @@ Job recJob = {0,0,0};
 /*----- Function prototypes ------------------------------------------------*/
 
 
-char Find_direction (Order p[],char last_position);
-char Array_arrange_4 (Order p[]);
+int Find_direction (Order p[],int last_position);
+int Array_arrange_4 (Order p[]);
 int checkValidOrder(Order order);
 
 
@@ -93,6 +93,27 @@ void controller(void)
 	int i;
 	//wichtige informationen updaten
 	//while(1);
+//	CARME_CAN_MESSAGE msg;
+//	for(i=1;i<5;i++)
+//	{
+//		msg.data[3]=i;//turn off lampe inside
+//		msg.id=0xC;
+//		msg.data[3]=i;//turn off lampe inside
+//		msg.id=0xD;
+//		xQueueSend(_toCan, &msg, 0);
+//		msg.data[3]=0xF1;						//turn off lampe outside up
+//		msg.id=i*2;
+//		xQueueSend(_toCan, &msg, 0);
+//		msg.data[3]=0xF1;
+//		msg.id=i*2+1;
+//		xQueueSend(_toCan, &msg, 0);
+//		msg.data[3]=0xF0;					//turn off lampe outside down
+//		msg.id=i*2;
+//		xQueueSend(_toCan, &msg, 0);
+//		msg.data[3]=0xF0;
+//		msg.id=i*2+1;
+//		xQueueSend(_toCan, &msg, 0);
+//	}
 	while(1){
 	switch (state)
 	{
@@ -258,12 +279,12 @@ void controller(void)
 					order++;
 				}else if(recJob.success==1)
 				{
-					msg.data[3]=Jobs_inprogress_lift_1[i].Floor;
+					msg.data[3]=Jobs_inprogress_lift_1[i].Floor;//turn off lampe inside
 					msg.id=0xC;
 					xQueueSend(_toCan, &msg, 0);
 					if(direction_lift_1==Up)
 					{
-						msg.data[3]=0xF1;
+						msg.data[3]=0xF1;						//turn off lampe outside up
 						msg.id=Jobs_inprogress_lift_1[i].Floor*2;
 						xQueueSend(_toCan, &msg, 0);
 						msg.data[3]=0xF1;
@@ -271,17 +292,16 @@ void controller(void)
 						xQueueSend(_toCan, &msg, 0);
 					}else if(direction_lift_1==Down)
 					{
-							msg.data[3]=0xF0;
+							msg.data[3]=0xF0;					//turn off lampe outside down
 							msg.id=Jobs_inprogress_lift_1[i].Floor*2;
 							xQueueSend(_toCan, &msg, 0);
 							msg.data[3]=0xF0;
 							msg.id=Jobs_inprogress_lift_1[i].Floor*2+1;
 							xQueueSend(_toCan, &msg, 0);
 					}
+					last_position_lift_1=Jobs_inprogress_lift_1[i].Floor;
 					Jobs_inprogress_lift_1[i]=noOrder;
 					inprogress_lift_1=Array_arrange_4(Jobs_inprogress_lift_1);
-
-
 				}
 			}
 			i++;
@@ -300,12 +320,12 @@ void controller(void)
 					order++;
 				}else if(recJob.success==1)
 				{
-					msg.data[3]=Jobs_inprogress_lift_2[i].Floor;
+					msg.data[3]=Jobs_inprogress_lift_2[i].Floor;//turn off lampe inside
 					msg.id=0xD;
 					xQueueSend(_toCan, &msg, 0);
 					if(direction_lift_1==Up)
 					{
-						msg.data[3]=0xF1;
+						msg.data[3]=0xF1;						//turn off lampe outside up
 						msg.id=Jobs_inprogress_lift_2[i].Floor*2;
 						xQueueSend(_toCan, &msg, 0);
 						msg.data[3]=0xF1;
@@ -313,17 +333,16 @@ void controller(void)
 						xQueueSend(_toCan, &msg, 0);
 					}else if(direction_lift_1==Down)
 					{
-						msg.data[3]=0xF0;
+						msg.data[3]=0xF0;					//turn off lampe outside down
 						msg.id=Jobs_inprogress_lift_2[i].Floor*2;
 						xQueueSend(_toCan, &msg, 0);
 						msg.data[3]=0xF0;
 						msg.id=Jobs_inprogress_lift_2[i].Floor*2+1;
 						xQueueSend(_toCan, &msg, 0);
 					}
+					last_position_lift_2=Jobs_inprogress_lift_2[i].Floor;
 					Jobs_inprogress_lift_2[i]=noOrder;
 					inprogress_lift_2=Array_arrange_4(Jobs_inprogress_lift_2);
-
-					xQueueSend(_toCan, &msg, 0);
 				}
 			}
 			i++;
@@ -352,30 +371,32 @@ void controller(void)
 			Pending_orders[order]=newOrder;
 			if(Pending_orders[order].Lift==1)
 			{
-				msg.data[3]=Pending_orders[order].Floor+0x80;
+				msg.data[3]=Pending_orders[order].Floor+0x80;//turn on lampe inside
 				msg.id=0xC;
 				xQueueSend(_toCan, &msg, 0);
 
 			}else if(Pending_orders[order].Lift==2)
 			{
-				msg.data[3]=Pending_orders[order].Floor+0x80;
+				msg.data[3]=Pending_orders[order].Floor+0x80;//turn on lampe inside
 				msg.id=0xD;
 				xQueueSend(_toCan, &msg, 0);
 			}else
 			{
 				if(Pending_orders[order].Direction==Up)
 				{
-					msg.data[3]=0xFB;
+					msg.data[3]=0xFB;						//turn on lampe outside
 					msg.id=Pending_orders[order].Floor*2;
 					xQueueSend(_toCan, &msg, 0);
+
 					msg.data[3]=0xFB;
 					msg.id=Pending_orders[order].Floor*2+1;
 					xQueueSend(_toCan, &msg, 0);
 				}else if(Pending_orders[order].Direction==Down)
 				{
-					msg.data[3]=0xFC;
+					msg.data[3]=0xFC;					//turn on lampe outside
 					msg.id=Pending_orders[order].Floor*2;
 					xQueueSend(_toCan, &msg, 0);
+
 					msg.data[3]=0xFC;
 					msg.id=Pending_orders[order].Floor*2+1;
 					xQueueSend(_toCan, &msg, 0);
@@ -391,24 +412,27 @@ void controller(void)
 
 }
 
-char Find_direction (Order p[],char last_position)
+int Find_direction (Order p[],int last_position)
 {
-	if(last_position==p[0].Floor)
+	if(p[0].Floor!=0)
 	{
-		return Stay;
-	}else if(last_position>p[0].Floor)
-	{
-		return Down;
-	}else if(last_position<p[0].Floor)
-	{
-		return Up;
-	}else
-	{
-		return Stay;
-	}
+		if(last_position==p[0].Floor)
+		{
+			return Stay;
+		}else if(last_position>p[0].Floor)
+		{
+			return Down;
+		}else if(last_position<p[0].Floor)
+		{
+			return Up;
+		}else
+		{
+			return Stay;
+		}
+	}else {return Stay;}
 	// h�chste oder tiefste position
 }
-char Array_arrange_4 (Order p[]) //Array sortieren
+int Array_arrange_4 (Order p[]) //Array sortieren
 {
 	int i,j;
 	j=0;

@@ -166,9 +166,9 @@ void finishedJob(int level, int id)
 		if(acceptedJob[id][level-1][i].targetFloor!=0){
 			acceptedJob[id][level-1][i].success=1; //set Succes bit
 			if(id){
-				xQueueSend(_liftBToController, &acceptedJob[level-1][i],queueTime);//inform the Controller
+				xQueueSend(_liftBToController, &acceptedJob[id][level-1][i],queueTime);//inform the Controller
 			} else {
-				xQueueSend(_liftAToController, &acceptedJob[level-1][i],queueTime);//inform the Controller
+				xQueueSend(_liftAToController, &acceptedJob[id][level-1][i],queueTime);//inform the Controller
 			}
 			acceptedJob[id][level-1][i]=noJob;//erase all Jobs done
 			//set counter to Zero
@@ -249,11 +249,13 @@ void lift(void *pvargs)
 
 				StoppLevel[id][RXJob.targetFloor-1] = 1; //set a mark where I need to stopp the elevator
 				addJob(RXJob,RXJob.targetFloor,id);//strore the Job
+				moveUp(id);
 
 			} else if((direction[id] == DOWN) && (RXJob.targetFloor < level[id])) {//Moving Downwards and the level is underneath
 				StoppLevel[id][RXJob.targetFloor-1]=1;
 				addJob(RXJob,RXJob.targetFloor,id);//store the job
 					//say to strategie the job is accepted
+				moveDown(id);
 			} else if(direction[id] == STILL){//Not moving
 				if(level[id] < RXJob.targetFloor ){//the Level is above
 					direction[id]=UP;
@@ -324,7 +326,7 @@ void lift(void *pvargs)
 					direction[id]=UP;//set Direction
 					moveUp(id);//move elavator
 				}
-				if(stillMoveUP==0){
+				if(stillMoveUP[id]==0){
 					direction[id]=STILL;
 				}
 			}
