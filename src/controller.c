@@ -186,6 +186,15 @@ void controller(void)
 
 									Pending_orders[i]=noOrder;
 								}
+								if(last_position_lift_1==Pending_orders[i].Floor)
+								{
+									Jobs_inprogress_lift_1[inprogress_lift_1+i]=Pending_orders[i];
+									sendJob.id=Jobs_inprogress_lift_1[i].Id;
+									sendJob.targetFloor=Jobs_inprogress_lift_1[i].Floor;
+									sendJob.success=0;
+									xQueueSend(_controllerToLiftA, &sendJob, 0);
+									Pending_orders[i]=noOrder;
+								}
 							}else if(direction_lift_1==Down)
 							{
 								if(last_position_lift_1<=Pending_orders[i].Floor)
@@ -197,6 +206,15 @@ void controller(void)
 									xQueueSend(_controllerToLiftA, &sendJob, 0);
 
 
+									Pending_orders[i]=noOrder;
+								}
+								if(last_position_lift_1==Pending_orders[i].Floor)
+								{
+									Jobs_inprogress_lift_1[inprogress_lift_1+i]=Pending_orders[i];
+									sendJob.id=Jobs_inprogress_lift_1[i].Id;
+									sendJob.targetFloor=Jobs_inprogress_lift_1[i].Floor;
+									sendJob.success=0;
+									xQueueSend(_controllerToLiftA, &sendJob, 0);
 									Pending_orders[i]=noOrder;
 								}
 							}
@@ -269,10 +287,11 @@ void controller(void)
 	i=0;
 	while(xQueueReceive(_liftAToController,&recJob, TIME)!=0)
 	{
-		do
+		for(i=0;i<20;i++)
 		{
 			if(recJob.id==Jobs_inprogress_lift_1[i].Id)
 			{
+
 				if(recJob.success==0)
 				{
 					Pending_orders[order]=Jobs_inprogress_lift_1[i];
@@ -303,17 +322,18 @@ void controller(void)
 					Jobs_inprogress_lift_1[i]=noOrder;
 					inprogress_lift_1=Array_arrange_4(Jobs_inprogress_lift_1);
 				}
+				i=19; //evil hack to abort the loop early
 			}
-			i++;
-		}while(recJob.id!=Jobs_inprogress_lift_1[i].Id);
+		}
 	}
 	i=0;
 	while(xQueueReceive(_liftBToController,&recJob, TIME)!=0)
 	{
-		do
+		for(i=0;i==20;i++)
 		{
 			if(recJob.id==Jobs_inprogress_lift_2[i].Id)
 			{
+
 				if(recJob.success==0)
 				{
 					Pending_orders[order]=Jobs_inprogress_lift_2[i];
@@ -344,9 +364,10 @@ void controller(void)
 					Jobs_inprogress_lift_2[i]=noOrder;
 					inprogress_lift_2=Array_arrange_4(Jobs_inprogress_lift_2);
 				}
+				i=19;
 			}
-			i++;
-		}while(recJob.id!=Jobs_inprogress_lift_1[i].Id);
+
+		}
 	}
 	i=0;
 	while(xQueueReceive(_canToController,&msg,TIME)!=0){

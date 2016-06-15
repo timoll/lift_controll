@@ -254,7 +254,6 @@ void lift(void *pvargs)
 			} else if((direction[id] == DOWN) && (RXJob.targetFloor < level[id])) {//Moving Downwards and the level is underneath
 				StoppLevel[id][RXJob.targetFloor-1]=1;
 				addJob(RXJob,RXJob.targetFloor,id);//store the job
-					//say to strategie the job is accepted
 				moveDown(id);
 			} else if(direction[id] == STILL){//Not moving
 				if(level[id] < RXJob.targetFloor ){//the Level is above
@@ -263,11 +262,15 @@ void lift(void *pvargs)
 					addJob(RXJob,RXJob.targetFloor,id);//store the job
 					moveUp(id);
 				}
-				if(level[id] > RXJob.targetFloor ){//the Level is underneath
+				if(level[id] > RXJob.targetFloor){//the Level is underneath
 					direction[id]=DOWN;
 					StoppLevel[id][RXJob.targetFloor-1]=1;
 					addJob(RXJob,RXJob.targetFloor,id);//store the job
 					moveDown(id);
+				}
+				if(level[id] == RXJob.targetFloor){//the Job is for the floor needed
+					StoppLevel[id][RXJob.targetFloor-1]=1;
+					addJob(RXJob,RXJob.targetFloor,id);//store the job
 				}
 			} else {
 				TXJob=RXJob;
@@ -296,7 +299,7 @@ void lift(void *pvargs)
 		}
 
 		//3a)-------------------------------------------------------------------------------------------------------------------------
-		if((endschalter[id] & 0x01) && (StoppLevel[id][level[id]-1] == 1)) {// reached and StoppLevelA Bit is (set LevelA-1) is necessary because the first level is 1, but I need an Index of 0
+		if(((endschalter[id] & 0x01) && (StoppLevel[id][level[id]-1] == 1))||(direction[id]=STILL && (StoppLevel[id][level[id]-1] == 1 ))) {// reached and StoppLevelA Bit is set or Lift is already in the level needed
 			reachedDestination(id);//Stops the motor
 
 			openDoor(level[id]*2+id);//(levelA*2) is necessary to translate for example LevelA=1 to the define stock1A=0x02 which is the address for the Can-Message
