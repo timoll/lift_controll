@@ -96,9 +96,10 @@ int main(void)
 	xTaskCreate(lift,(const signed char * const)"LiftA", 1024, (void*)0, 4, NULL);
 	xTaskCreate(lift,(const signed char * const)"LiftB", 1024, (void*)1, 4, NULL);
 
+
 	xTaskCreate(controller,(const signed char * const)"controller",  1024, (void*)0, 4, NULL);
 	initQueues();
-
+	//clearLamps();
 	vTaskStartScheduler();
 
 	for(;;){}

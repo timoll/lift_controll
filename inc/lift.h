@@ -36,6 +36,7 @@ CARME_CAN_MESSAGE msg;
  void moveUp(int address);
  void moveDown(int address);
 int getInformation(int);
+void clearLamps();
 
 extern void lift(void *pvargs);
 extern int initLift(int);

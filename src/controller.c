@@ -91,6 +91,7 @@ int checkValidOrder(Order order);
 void controller(void)
 {
 	int i;
+	//clearLamps();
 	//wichtige informationen updaten
 	//while(1);
 //	CARME_CAN_MESSAGE msg;
@@ -410,13 +411,13 @@ void controller(void)
 			if(Pending_orders[order].Lift==1)
 			{
 				msg.data[3]=Pending_orders[order].Floor+0x80;//turn on lampe inside
-				msg.id=0xC;
+				msg.id=0xD;
 				xQueueSend(_toCan, &msg, 0);
 
 			}else if(Pending_orders[order].Lift==2)
 			{
 				msg.data[3]=Pending_orders[order].Floor+0x80;//turn on lampe inside
-				msg.id=0xD;
+				msg.id=0xC;
 				xQueueSend(_toCan, &msg, 0);
 			}else
 			{
@@ -522,5 +523,4 @@ int checkValidOrder(Order order){
 	}
 	return 1;
 }
-
 

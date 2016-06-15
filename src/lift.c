@@ -207,6 +207,30 @@ int initLift(int id)
 	xSemaphoreGive(_initLift);
 	return finished;
 }
+void clearLamps(){
+	CARME_CAN_MESSAGE msg=_zeroCanMessage;
+	int i;
+	for(i=2; i<0x0C;i++){
+		msg.id=i;
+		msg.data[3]=0xF0;
+		xQueueSend(_toCan, &msg, 0xFFFF);
+		msg.data[3]=0xF1;
+		CARME_CAN_Write(&msg);
+		xQueueSend(_toCan, &msg, 0xFFFF);
+		vTaskDelay(10);
+
+	}
+	for(i=1;i<=5;i++){
+		msg.id=0xc;
+		msg.data[3]=i;
+		xQueueSend(_toCan, &msg, 0xFFFF);
+		msg.id=0xd;
+		CARME_CAN_Write(&msg);
+		xQueueSend(_toCan, &msg, 0xFFFF);
+		vTaskDelay(10);
+	}
+
+}
 
 
 //Task-Code
@@ -222,6 +246,7 @@ void lift(void *pvargs)
 //			getInformation(id);
 //		}
 //	}
+	clearLamps();
 	initLift(id);
 	for(;;){
 		while(getInformation(id));
