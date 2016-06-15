@@ -299,7 +299,7 @@ void lift(void *pvargs)
 		}
 
 		//3a)-------------------------------------------------------------------------------------------------------------------------
-		if(((endschalter[id] & 0x01) && (StoppLevel[id][level[id]-1] == 1))||(direction[id]=STILL && (StoppLevel[id][level[id]-1] == 1 ))) {// reached and StoppLevelA Bit is set or Lift is already in the level needed
+		if(((endschalter[id] & 0x01) && (StoppLevel[id][level[id]-1] == 1))||((direction[id]==STILL) && (StoppLevel[id][level[id]-1] == 1 ))) {// reached and StoppLevelA Bit is set or Lift is already in the level needed
 			reachedDestination(id);//Stops the motor
 
 			openDoor(level[id]*2+id);//(levelA*2) is necessary to translate for example LevelA=1 to the define stock1A=0x02 which is the address for the Can-Message
@@ -348,7 +348,7 @@ void lift(void *pvargs)
 				if(stillMoveDOWN[id]==0){
 					direction[id]=STILL;
 				}
-						}
+			}
 			//Job is done
 
 			finishedJob(level[id],id);//Inform of the finished Jobs

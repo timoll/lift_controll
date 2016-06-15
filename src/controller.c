@@ -164,44 +164,41 @@ void controller(void)
 									direction_lift_1=Stay;
 								}
 								Jobs_inprogress_lift_1[inprogress_lift_1+i]=Pending_orders[i];
-								sendJob.id=Jobs_inprogress_lift_1[i].Id;
-								sendJob.targetFloor=Jobs_inprogress_lift_1[i].Floor;
+								sendJob.id=Jobs_inprogress_lift_1[inprogress_lift_1+i].Id;
+								sendJob.targetFloor=Jobs_inprogress_lift_1[inprogress_lift_1+i].Floor;
 								sendJob.success=0;
 								xQueueSend(_controllerToLiftA, &sendJob, 0);
 
 
 								Pending_orders[i]=noOrder;
 
-							}else if(direction_lift_1==Up)
-							{
-								if(last_position_lift_1>=Pending_orders[i].Floor)
-								{
-									Jobs_inprogress_lift_1[inprogress_lift_1+i]=Pending_orders[i];
-									sendJob.id=Jobs_inprogress_lift_1[i].Id;
-									sendJob.targetFloor=Jobs_inprogress_lift_1[i].Floor;
-									sendJob.success=0;
-									xQueueSend(_controllerToLiftA, &sendJob, 0);
-
-
-
-									Pending_orders[i]=noOrder;
-								}
-								if(last_position_lift_1==Pending_orders[i].Floor)
-								{
-									Jobs_inprogress_lift_1[inprogress_lift_1+i]=Pending_orders[i];
-									sendJob.id=Jobs_inprogress_lift_1[i].Id;
-									sendJob.targetFloor=Jobs_inprogress_lift_1[i].Floor;
-									sendJob.success=0;
-									xQueueSend(_controllerToLiftA, &sendJob, 0);
-									Pending_orders[i]=noOrder;
-								}
-							}else if(direction_lift_1==Down)
+							}else if(direction_lift_1==Up&&(Pending_orders[i].Direction==Up||Pending_orders[i].Direction==Stay))
 							{
 								if(last_position_lift_1<=Pending_orders[i].Floor)
 								{
 									Jobs_inprogress_lift_1[inprogress_lift_1+i]=Pending_orders[i];
-									sendJob.id=Jobs_inprogress_lift_1[i].Id;
-									sendJob.targetFloor=Jobs_inprogress_lift_1[i].Floor;
+									sendJob.id=Jobs_inprogress_lift_1[inprogress_lift_1+i].Id;
+									sendJob.targetFloor=Jobs_inprogress_lift_1[inprogress_lift_1+i].Floor;
+									sendJob.success=0;
+									xQueueSend(_controllerToLiftA, &sendJob, 0);
+									Pending_orders[i]=noOrder;
+								}
+								if(last_position_lift_1==Pending_orders[i].Floor)
+								{
+									Jobs_inprogress_lift_1[inprogress_lift_1+i]=Pending_orders[i];
+									sendJob.id=Jobs_inprogress_lift_1[inprogress_lift_1+i].Id;
+									sendJob.targetFloor=Jobs_inprogress_lift_1[inprogress_lift_1+i].Floor;
+									sendJob.success=0;
+									xQueueSend(_controllerToLiftA, &sendJob, 0);
+									Pending_orders[i]=noOrder;
+								}
+							}else if(direction_lift_1==Down&&(Pending_orders[i].Direction==Down||Pending_orders[i].Direction==Stay))
+							{
+								if(last_position_lift_1>=Pending_orders[i].Floor)
+								{
+									Jobs_inprogress_lift_1[inprogress_lift_1+i]=Pending_orders[i];
+									sendJob.id=Jobs_inprogress_lift_1[inprogress_lift_1+i].Id;
+									sendJob.targetFloor=Jobs_inprogress_lift_1[inprogress_lift_1+i].Floor;
 									sendJob.success=0;
 									xQueueSend(_controllerToLiftA, &sendJob, 0);
 
@@ -211,8 +208,8 @@ void controller(void)
 								if(last_position_lift_1==Pending_orders[i].Floor)
 								{
 									Jobs_inprogress_lift_1[inprogress_lift_1+i]=Pending_orders[i];
-									sendJob.id=Jobs_inprogress_lift_1[i].Id;
-									sendJob.targetFloor=Jobs_inprogress_lift_1[i].Floor;
+									sendJob.id=Jobs_inprogress_lift_1[inprogress_lift_1+i].Id;
+									sendJob.targetFloor=Jobs_inprogress_lift_1[inprogress_lift_1+i].Floor;
 									sendJob.success=0;
 									xQueueSend(_controllerToLiftA, &sendJob, 0);
 									Pending_orders[i]=noOrder;
@@ -235,32 +232,52 @@ void controller(void)
 									direction_lift_2=Stay;
 								}
 								Jobs_inprogress_lift_2[inprogress_lift_2+i]=Pending_orders[i];
-								sendJob.id=Jobs_inprogress_lift_2[i].Id;
-								sendJob.targetFloor=Jobs_inprogress_lift_2[i].Floor;
+								sendJob.id=Jobs_inprogress_lift_2[inprogress_lift_2+i].Id;
+								sendJob.targetFloor=Jobs_inprogress_lift_2[inprogress_lift_2+i].Floor;
 								sendJob.success=0;
 								xQueueSend(_controllerToLiftB, &sendJob, 0);
 
 								Pending_orders[i]=noOrder;
 
-							}else if(direction_lift_2==Up)
+							}else if(direction_lift_2==Up&&(Pending_orders[i].Direction==Up||Pending_orders[i].Direction==Stay))
 							{
-								if(last_position_lift_2>=Pending_orders[i].Floor)
+								if(last_position_lift_2<=Pending_orders[i].Floor)
 								{
 									Jobs_inprogress_lift_2[inprogress_lift_2+i]=Pending_orders[i];
-									sendJob.id=Jobs_inprogress_lift_2[i].Id;
-									sendJob.targetFloor=Jobs_inprogress_lift_2[i].Floor;
+									sendJob.id=Jobs_inprogress_lift_2[inprogress_lift_2+i].Id;
+									sendJob.targetFloor=Jobs_inprogress_lift_2[inprogress_lift_2+i].Floor;
 									sendJob.success=0;
 									xQueueSend(_controllerToLiftB, &sendJob, 0);
 
 									Pending_orders[i]=noOrder;
 								}
-							}else if(direction_lift_2==Down)
-							{
-								if(last_position_lift_2<=Pending_orders[i].Floor)
+								if(last_position_lift_2==Pending_orders[i].Floor)
 								{
 									Jobs_inprogress_lift_2[inprogress_lift_2+i]=Pending_orders[i];
-									sendJob.id=Jobs_inprogress_lift_2[i].Id;
-									sendJob.targetFloor=Jobs_inprogress_lift_2[i].Floor;
+									sendJob.id=Jobs_inprogress_lift_2[inprogress_lift_2+i].Id;
+									sendJob.targetFloor=Jobs_inprogress_lift_2[inprogress_lift_2+i].Floor;
+									sendJob.success=0;
+									xQueueSend(_controllerToLiftB, &sendJob, 0);
+
+									Pending_orders[i]=noOrder;
+								}
+							}else if(direction_lift_2==Down&&(Pending_orders[i].Direction==Down||Pending_orders[i].Direction==Stay))
+							{
+								if(last_position_lift_2>=Pending_orders[i].Floor)
+								{
+									Jobs_inprogress_lift_2[inprogress_lift_2+i]=Pending_orders[i];
+									sendJob.id=Jobs_inprogress_lift_2[inprogress_lift_2+i].Id;
+									sendJob.targetFloor=Jobs_inprogress_lift_2[inprogress_lift_2+i].Floor;
+									sendJob.success=0;
+									xQueueSend(_controllerToLiftB, &sendJob, 0);
+
+									Pending_orders[i]=noOrder;
+								}
+								if(last_position_lift_2==Pending_orders[i].Floor)
+								{
+									Jobs_inprogress_lift_2[inprogress_lift_2+i]=Pending_orders[i];
+									sendJob.id=Jobs_inprogress_lift_2[inprogress_lift_2+i].Id;
+									sendJob.targetFloor=Jobs_inprogress_lift_2[inprogress_lift_2+i].Floor;
 									sendJob.success=0;
 									xQueueSend(_controllerToLiftB, &sendJob, 0);
 
@@ -329,7 +346,7 @@ void controller(void)
 	i=0;
 	while(xQueueReceive(_liftBToController,&recJob, TIME)!=0)
 	{
-		for(i=0;i==20;i++)
+		for(i=0;i<20;i++)
 		{
 			if(recJob.id==Jobs_inprogress_lift_2[i].Id)
 			{
@@ -476,7 +493,7 @@ int Array_arrange_4 (Order p[]) //Array sortieren
 }
 
 int checkValidOrder(Order order){
-	if(1>=order.Floor||order.Floor>=5){
+	if(order.Floor<1||order.Floor>5){
 		return 0;
 	}
 	if(order.Direction>2||order.Direction<0){
