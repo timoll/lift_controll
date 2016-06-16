@@ -139,13 +139,35 @@ void controller(void)
 					Lift_12=Pending_orders[i].Lift;
 					if(Lift_12==Outside)
 					{
-						if(abs(last_position_lift_1-Pending_orders[i].Floor)>abs(last_position_lift_2-Pending_orders[i].Floor))
+						if(Jobs_inprogress_lift_1[0].Floor==0&&Jobs_inprogress_lift_2[0].Floor==0)
 						{
-							Lift_12=Lift2;
+							if(abs(last_position_lift_1-Pending_orders[i].Floor)>abs(last_position_lift_2-Pending_orders[i].Floor))
+							{
+								Lift_12=Lift2;
+							}
+							else
+							{
+								Lift_12=Lift1;
+							}
 						}
 						else
 						{
-							Lift_12=Lift1;
+							if(Jobs_inprogress_lift_1[0].Floor==0)
+							{
+								Lift_12=Lift1;
+							}else if(Jobs_inprogress_lift_2[0].Floor==0)
+							{
+								Lift_12=Lift2;
+							}else{
+								if(abs(Jobs_inprogress_lift_1[0].Floor-Pending_orders[i].Floor)>abs(Jobs_inprogress_lift_2[0].Floor-Pending_orders[i].Floor))
+								{
+									Lift_12=Lift2;
+								}
+								else
+								{
+									Lift_12=Lift1;
+								}
+							}
 						}
 					}
 					switch (Lift_12)
@@ -408,16 +430,16 @@ void controller(void)
 		}
 		if(checkValidOrder(newOrder)){
 			Pending_orders[order]=newOrder;
-			if(Pending_orders[order].Lift==1)
-			{
-				msg.data[3]=Pending_orders[order].Floor+0x80;//turn on lampe inside
-				msg.id=0xD;
-				xQueueSend(_toCan, &msg, 0);
-
-			}else if(Pending_orders[order].Lift==2)
+			if(Pending_orders[order].Lift==Lift1)
 			{
 				msg.data[3]=Pending_orders[order].Floor+0x80;//turn on lampe inside
 				msg.id=0xC;
+				xQueueSend(_toCan, &msg, 0);
+
+			}else if(Pending_orders[order].Lift==Lift2)
+			{
+				msg.data[3]=Pending_orders[order].Floor+0x80;//turn on lampe inside
+				msg.id=0xD;
 				xQueueSend(_toCan, &msg, 0);
 			}else
 			{
